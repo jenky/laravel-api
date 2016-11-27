@@ -7,7 +7,7 @@ use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler as LaravelExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Jenky\LaravelAPI\Contracts\Debug\ExceptionHandler;
-use Jenky\LaravelAPI\Http\RequestValidator;
+use Jenky\LaravelAPI\Contracts\Http\Validator;
 
 class Request
 {
@@ -44,9 +44,7 @@ class Request
     public function handle($request, Closure $next)
     {
         try {
-            $validator = $this->app->make(RequestValidator::class);
-
-            if ($validator->validateRequest($request)) {
+            if ($this->app[Validator::class]->validate($request)) {
                 $this->app->singleton(LaravelExceptionHandler::class, function ($app) {
                     return $app[ExceptionHandler::class];
                 });
