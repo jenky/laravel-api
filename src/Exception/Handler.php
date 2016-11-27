@@ -18,6 +18,20 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class Handler extends IlluminateExceptionHandler implements ExceptionHandler, ExceptionHandlerContract
 {
     /**
+     * A list of the exception types that should not be reported.
+     *
+     * @var array
+     */
+    protected $dontReport = [
+        \Illuminate\Auth\AuthenticationException::class,
+        \Illuminate\Auth\Access\AuthorizationException::class,
+        \Symfony\Component\HttpKernel\Exception\HttpException::class,
+        \Illuminate\Database\Eloquent\ModelNotFoundException::class,
+        \Illuminate\Session\TokenMismatchException::class,
+        \Illuminate\Validation\ValidationException::class,
+    ];
+
+    /**
      * Array of exception handlers.
      *
      * @var array
@@ -93,7 +107,8 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
-        $e = new ValidationExceptionHandler($e);
+        $handler = $this->container['config']->get('api.handlers.validation_exception');
+        $e = new $handler($e);
 
         return $this->toResponse($e);
     }
