@@ -21,6 +21,13 @@ class Request
      */
     protected $exception;
 
+    /**
+     * Create a new middleware request.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @param  \Jenky\LaravelAPI\Contracts\Debug\ExceptionHandler $exception
+     * @return void
+     */
     public function __construct(Application $app, ExceptionHandler $exception)
     {
         $this->app = $app;
@@ -30,9 +37,8 @@ class Request
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure                 $next
-     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure $next
      * @return mixed
      */
     public function handle($request, Closure $next)
