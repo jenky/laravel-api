@@ -1,13 +1,12 @@
 {
-    "name": "jenky/laravel-push-notification",
-    "description": "Laravel Push Notification",
+    "name": "jenky/laravel-api",
+    "description": "Laravel API",
     "keywords": [
         "laravel",
-        "push notification",
-        "notification",
-        "laravel notifications"
+        "api",
+        "restapi"
     ],
-    "homepage": "https://github.com/jenky/laravel-push-notification",
+    "homepage": "https://github.com/jenky/laravel-api",
     "license": "MIT",
     "authors": [
         {
@@ -16,25 +15,22 @@
         }
     ],
     "require": {
-        "illuminate/config": "5.1.*|5.2.*|5.3.*",
-        "illuminate/queue": "5.1.*|5.2.*|5.3.*",
-        "sly/notification-pusher": "^2.2"
+        "illuminate/contracts": "5.2.*|5.3.*",
+        "illuminate/config": "5.2.*|5.3.*",
+        "illuminate/support": "5.2.*|5.3.*"
     },
     "require-dev": {
         "phpunit/phpunit" : "4.*"
     },
     "autoload": {
         "psr-4": {
-            "Jenky\\LaravelPushNotification\\": "src"
+            "Jenky\\LaravelAPI\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Jenky\\LaravelNotification\\Test\\": "tests"
+            "Jenky\\LaravelAPI\\Test\\": "tests"
         }
-    },
-    "suggest": {
-        "illuminate/notifications": "Required to use Laravel Notifications (~5.3)."
     },
     "scripts": {
         "test": "phpunit"
