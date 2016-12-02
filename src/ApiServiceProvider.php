@@ -7,7 +7,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 use Jenky\LaravelAPI\Contracts\Debug\ExceptionHandler;
+use Jenky\LaravelAPI\Contracts\Http\Parser;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
+use Jenky\LaravelAPI\Http\AcceptParser;
 use Jenky\LaravelAPI\Http\Middleware\Request;
 use Jenky\LaravelAPI\Http\Router;
 use Jenky\LaravelAPI\Http\Validator\Domain;
@@ -27,7 +29,6 @@ class ApiServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->setupConfig();
         $this->app[Kernel::class]->prependMiddleware(Request::class);
         $this->app->register(FractalServiceProvider::class);
     }
@@ -39,6 +40,8 @@ class ApiServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->setupConfig();
+
         $this->app->singleton(Validator::class, function () {
             return $this->createRequestValidator();
         });
@@ -47,6 +50,10 @@ class ApiServiceProvider extends ServiceProvider
             $handler = $this->config('handlers.exception');
 
             return new $handler($app);
+        });
+
+        $this->app->singleton(Parser::class, function ($app) {
+            return new AcceptParser($this->config('standardsTree'), $this->config('subtype'), $this->config('version'), 'json');
         });
 
         $this->registerResponseMacros();
@@ -66,7 +73,7 @@ class ApiServiceProvider extends ServiceProvider
     }
 
     /**
-     * Get API config value
+     * Get API config value.
      *
      * @param  string $key
      * @param  mixed $default
@@ -85,7 +92,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function createRequestValidator()
     {
-        switch ($this->config('scheme')) {
+        switch ($this->config('uri_scheme')) {
             case 'prefix':
                 return new Prefix($this->config('prefix'));
                 break;

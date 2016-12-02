@@ -52,7 +52,7 @@ class Request
         } catch (Exception $exception) {
             $this->exception->report($exception);
 
-            return $this->exception->handle($exception);
+            return $this->exception->render($request, $exception);
         }
 
         return $next($request);
