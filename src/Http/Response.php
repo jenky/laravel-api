@@ -219,7 +219,7 @@ class Response extends IlluminateResponse
      *
      * @param  \Spatie\Fractal\Fractal $fractal
      * @param  callable|null $callback
-     * @return string
+     * @return $this
      */
     protected function fractalResponse(Fractal $fractal, callable $callback = null)
     {
