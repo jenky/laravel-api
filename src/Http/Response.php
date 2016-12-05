@@ -20,7 +20,7 @@ class Response extends IlluminateResponse
      */
     public function created($content = null, $location = null)
     {
-        return $this->responseWithLocationAndContent(201, $content, $location);
+        return $this->responseWithContentAndLocation(201, $content, $location);
     }
 
     /**
@@ -32,7 +32,7 @@ class Response extends IlluminateResponse
      */
     public function accepted($content = null, $location = null)
     {
-        return $this->responseWithLocationAndContent(202, $content, $location);
+        return $this->responseWithContentAndLocation(202, $content, $location);
     }
 
     /**
@@ -43,14 +43,14 @@ class Response extends IlluminateResponse
      * @param  null|string $location
      * @return $this
      */
-    protected function responseWithLocationAndContent($status, $content = null, $location = null)
+    protected function responseWithContentAndLocation($status, $content = null, $location = null)
     {
-        if ($location) {
-            $this->header('Location', $location);
-        }
-
         if ($content) {
             $this->setContent($content);
+        }
+
+        if ($location) {
+            $this->header('Location', $location);
         }
 
         $this->setStatusCode($status);
