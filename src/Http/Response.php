@@ -14,36 +14,36 @@ class Response extends IlluminateResponse
     /**
      * Respond with a created response and associate a location and/or content if provided.
      *
-     * @param  null|string $location
      * @param  mixed $content
+     * @param  null|string $location
      * @return $this
      */
-    public function created($location = null, $content = null)
+    public function created($content = null, $location = null)
     {
-        return $this->responseWithLocationAndContent(201, $location, $content);
+        return $this->responseWithLocationAndContent(201, $content, $location);
     }
 
     /**
      * Respond with an accepted response and associate a location and/or content if provided.
      *
-     * @param  null|string $location
      * @param  mixed $content
+     * @param  null|string $location
      * @return $this
      */
-    public function accepted($location = null, $content = null)
+    public function accepted($content = null, $location = null)
     {
-        return $this->responseWithLocationAndContent(202, $location, $content);
+        return $this->responseWithLocationAndContent(202, $content, $location);
     }
 
     /**
      * Make a response and associate a location and/or content if provided.
      *
      * @param  int $status
-     * @param  null|string $location
      * @param  mixed $content
+     * @param  null|string $location
      * @return $this
      */
-    protected function responseWithLocationAndContent($status, $location = null, $content = null)
+    protected function responseWithLocationAndContent($status, $content = null, $location = null)
     {
         if ($location) {
             $this->header('Location', $location);
