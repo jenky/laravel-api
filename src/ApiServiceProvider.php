@@ -3,7 +3,6 @@
 namespace Jenky\LaravelAPI;
 
 use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 use Jenky\LaravelAPI\Contracts\Debug\ExceptionHandler;
@@ -11,13 +10,11 @@ use Jenky\LaravelAPI\Contracts\Http\Parser;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Http\AcceptParser;
 use Jenky\LaravelAPI\Http\Middleware\Request;
-use Jenky\LaravelAPI\Http\Router;
+use Jenky\LaravelAPI\Http\Response as ApiResponse;
+use Jenky\LaravelAPI\Http\Routing\Router;
 use Jenky\LaravelAPI\Http\Validator\Domain;
 use Jenky\LaravelAPI\Http\Validator\Prefix;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use League\Fractal\TransformerAbstract;
 use RuntimeException;
-use Spatie\Fractal\Fractal;
 use Spatie\Fractal\FractalServiceProvider;
 
 class ApiServiceProvider extends ServiceProvider
@@ -68,8 +65,11 @@ class ApiServiceProvider extends ServiceProvider
     protected function setupConfig()
     {
         $configPath = __DIR__.'/../config/api.php';
-        $this->publishes([$configPath => config_path('api.php')], 'config');
         $this->mergeConfigFrom($configPath, 'api');
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([$configPath => config_path('api.php')], 'config');
+        }
     }
 
     /**
@@ -114,37 +114,23 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerResponseMacros()
     {
-        $response = function (Fractal $fractal, callable $callback = null) {
-            if ($callback) {
-                // $fractal = $callback($fractal);
-                return $callback($fractal);
+        Response::macro('api', function () {
+            return new ApiResponse;
+        });
+
+        $methods = [
+            'created', 'accepted', 'noContent',
+            'error', 'badRequest', 'unauthorized', 'forbidden', 'notFound', 'unprocessable', 'internalError',
+            'item', 'collection', 'transform',
+        ];
+
+        foreach ($methods as $method) {
+            if (! Response::hasMacro($method)) {
+                Response::macro($method, function () use ($method) {
+                    return call_user_func_array([$this->api(), $method], func_get_args());
+                });
             }
-
-            return $fractal->toJson();
-        };
-
-        Response::macro('item', function ($data, TransformerAbstract $transformer, callable $callback = null) use ($response) {
-            return $response(fractal()->item($data, $transformer), $callback);
-        });
-
-        Response::macro('collection', function ($data, TransformerAbstract $transformer, callable $callback = null) use ($response) {
-            return $response(fractal()->collection($data, $transformer), $callback);
-        });
-
-        Response::macro('paginator', function (LengthAwarePaginator $data, TransformerAbstract $transformer, callable $callback = null) use ($response) {
-            $fractal = fractal()->collection($data->getCollection(), $transformer)
-                ->paginateWith(new IlluminatePaginatorAdapter($data));
-
-            return $response($fractal, $callback);
-        });
-
-        Response::macro('transform', function ($data, TransformerAbstract $transformer, callable $callback = null) use ($response) {
-            if ($data instanceof LengthAwarePaginator) {
-                return $this->paginator($data, $transformer, $callback);
-            }
-
-            return $response(fractal($data, $transformer), $callback);
-        });
+        }
     }
 
     /**

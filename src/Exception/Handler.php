@@ -198,6 +198,7 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
             if (is_string($value)) {
                 return ! starts_with($value, ':');
             }
+
             return true;
         });
     }
@@ -231,7 +232,7 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
         return $exception->getClass()->getName();
     }
 
-     /**
+    /**
      * Determines if we are running in debug mode.
      *
      * @return bool
