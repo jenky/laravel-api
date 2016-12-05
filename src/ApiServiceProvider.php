@@ -65,8 +65,11 @@ class ApiServiceProvider extends ServiceProvider
     protected function setupConfig()
     {
         $configPath = __DIR__.'/../config/api.php';
-        $this->publishes([$configPath => config_path('api.php')], 'config');
         $this->mergeConfigFrom($configPath, 'api');
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([$configPath => config_path('api.php')], 'config');
+        }
     }
 
     /**
