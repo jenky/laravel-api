@@ -132,6 +132,18 @@ class Response extends IlluminateResponse
     }
 
     /**
+     * Return a 422 unprocessable entity error.
+     *
+     * @param  string $message
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @return void
+     */
+    public function unprocessable($message = 'Unprocessable Entity')
+    {
+        return $this->error(422, $message);
+    }
+
+    /**
      * Return a 500 internal server error.
      *
      * @param  string $message
