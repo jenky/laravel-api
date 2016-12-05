@@ -67,7 +67,7 @@ class Router
         return $this->router->group($attributes, $callback);
     }
 
-     /**
+    /**
      * Parse the parameters to pass to router.
      *
      * @param  string $version
