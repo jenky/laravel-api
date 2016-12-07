@@ -9,7 +9,6 @@ use Illuminate\Foundation\Exceptions\Handler as IlluminateExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Jenky\LaravelAPI\Contracts\Debug\ExceptionHandler;
-use Jenky\LaravelAPI\Contracts\Debug\ValidationExceptionInterface;
 use ReflectionFunction;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
@@ -107,9 +106,6 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
-        $handler = $this->container['config']->get('api.handlers.validation_exception');
-        $e = new $handler($e);
-
         return $this->toResponse($e);
     }
 
@@ -151,10 +147,14 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
             $message = array_get(Response::$statusTexts, $statusCode);
         }
 
-        if ($exception instanceof ValidationExceptionInterface && $exception->hasErrors()) {
+        if ($exception instanceof ValidationException) {
+            $validator = $exception->validator;
             $statusCode = 422;
             $e->setStatusCode($statusCode);
-            $replacements[':errors'] = $exception->getErrors();
+
+            if (! $validator->errors()->isEmpty()) {
+                $replacements[':errors'] = $validator->errors();
+            }
         }
 
         $replacements += [
@@ -239,7 +239,7 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
      */
     protected function runningInDebugMode()
     {
-        return true;
+        return $this->container['config']->get('app.debug', false);
     }
 
     /**
