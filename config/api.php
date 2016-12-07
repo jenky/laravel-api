@@ -121,7 +121,6 @@ return [
 
     'handlers' => [
         'exception' => Jenky\LaravelAPI\Exception\Handler::class,
-        'validation_exception' => Jenky\LaravelAPI\Exception\ValidationExceptionHandler::class,
     ],
 
 ];
