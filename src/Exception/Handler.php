@@ -157,6 +157,12 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
             }
         }
 
+        if ($exception instanceof ExceptionWithError) {
+            if ($exception->hasErrors()) {
+                $replacements[':errors'] = $exception->getErrors();
+            }
+        }
+
         $replacements += [
             ':message' => $message,
             ':status_code' => $statusCode,
