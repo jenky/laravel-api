@@ -228,7 +228,7 @@ class Response extends IlluminateResponse
             return $callback($fractal);
         }
 
-        $this->setContent($fractal->toJson());
+        $this->setContent($fractal->toArray());
 
         return $this;
     }
