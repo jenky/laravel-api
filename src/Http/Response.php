@@ -128,7 +128,7 @@ class Response extends IlluminateResponse
      */
     public function notFound($message = 'Not Found')
     {
-        return $this->error(404, $message);
+        return $this->error($message, 404);
     }
 
     /**
@@ -140,7 +140,7 @@ class Response extends IlluminateResponse
      */
     public function unprocessable($message = 'Unprocessable Entity')
     {
-        return $this->error(422, $message);
+        return $this->error($message, 422);
     }
 
     /**
