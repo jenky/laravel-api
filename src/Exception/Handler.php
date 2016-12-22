@@ -82,7 +82,13 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
      */
     protected function prepareResponse($request, Exception $exception)
     {
-        return $this->toResponse($exception);
+        $response = $this->toResponse($exception);
+
+        if ($this->container->bound(\Barryvdh\Cors\Stack\CorsService::class)) {
+            $this->container[\Barryvdh\Cors\Stack\CorsService::class]->addActualRequestHeaders($response, $request);
+        }
+
+        return $response;
     }
 
     /**
@@ -255,13 +261,13 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
      */
     protected function getErrorFormat()
     {
-        return [
+        return $this->container['config']->get('api.errorFormat', [
             'message' => ':message',
             'status_code' => ':status_code',
             'errors' => ':errors',
             'code' => ':code',
             'debug' => ':debug',
-        ];
+        ]);
     }
 
     /**
