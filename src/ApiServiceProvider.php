@@ -121,7 +121,7 @@ class ApiServiceProvider extends ServiceProvider
         $methods = [
             'created', 'accepted', 'noContent',
             'error', 'badRequest', 'unauthorized', 'forbidden', 'notFound', 'unprocessable', 'internalError',
-            'item', 'collection', 'transform',
+            'item', 'collection', 'paginator', 'transform',
         ];
 
         foreach ($methods as $method) {

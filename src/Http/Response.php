@@ -5,6 +5,7 @@ namespace Jenky\LaravelAPI\Http;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Response as IlluminateResponse;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use League\Fractal\Serializer\ArraySerializer;
 use League\Fractal\TransformerAbstract;
 use Spatie\Fractal\Fractal;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -192,6 +193,7 @@ class Response extends IlluminateResponse
     public function paginator(LengthAwarePaginator $data, TransformerAbstract $transformer, callable $callback = null)
     {
         $fractal = fractal()->collection($data->getCollection(), $transformer)
+            ->serializeWith(new ArraySerializer)
             ->paginateWith(new IlluminatePaginatorAdapter($data));
 
         return $this->fractalResponse($fractal, $callback);
