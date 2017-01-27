@@ -165,7 +165,7 @@ class Response extends IlluminateResponse
      * @param  callable|null $callback
      * @return $this
      */
-    public function fractal($data, TransformerAbstract $transformer, $serializer = null, $callback = null)
+    public function fractal($data, TransformerAbstract $transformer, $serializer = null, callable $callback = null)
     {
         $fractal = fractal($data, $transformer);
 
@@ -191,9 +191,9 @@ class Response extends IlluminateResponse
      * @param  callable|null $callback
      * @return $this
      */
-    protected function fractalResponse(Fractal $fractal, $callback = null)
+    protected function fractalResponse(Fractal $fractal, callable $callback = null)
     {
-        if (is_callable($callback)) {
+        if ($callback) {
             $fractal = $callback($fractal);
             // return $callback($fractal);
         }
