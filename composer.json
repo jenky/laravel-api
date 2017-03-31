@@ -18,6 +18,7 @@
         "illuminate/contracts": "5.2.*|5.3.*|5.4.*",
         "illuminate/config": "5.2.*|5.3.*|5.4.*",
         "illuminate/support": "5.2.*|5.3.*|5.4.*",
+        "barryvdh/laravel-cors": "^0.9.2",
         "spatie/laravel-fractal": "^3.0"
     },
     "require-dev": {

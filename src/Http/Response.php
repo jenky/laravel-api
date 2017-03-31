@@ -5,7 +5,7 @@ namespace Jenky\LaravelAPI\Http;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Response as IlluminateResponse;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use League\Fractal\Serializer\ArraySerializer;
+use League\Fractal\Serializer\SerializerAbstract;
 use League\Fractal\TransformerAbstract;
 use Spatie\Fractal\Fractal;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -157,63 +157,31 @@ class Response extends IlluminateResponse
     }
 
     /**
-     * Bind an item to a transformer and start building a response.
-     *
-     * @param  object|array $data
-     * @param  \League\Fractal\TransformerAbstract $transformer
-     * @param  \Closure $callback
-     * @return $this
-     */
-    public function item($data, TransformerAbstract $transformer, callable $callback = null)
-    {
-        return $this->fractalResponse(fractal()->item($data, $transformer), $callback);
-    }
-
-    /**
-     * Bind an collection/multidimensional array to a transformer and start building a response.
-     *
-     * @param  \Illuminate\Support\Collection|array $data
-     * @param  \League\Fractal\TransformerAbstract $transformer
-     * @param  \Closure $callback
-     * @return $this
-     */
-    public function collection($data, TransformerAbstract $transformer, callable $callback = null)
-    {
-        return $this->fractalResponse(fractal()->collection($data, $transformer), $callback);
-    }
-
-    /**
-     * Bind an paginator to a transformer and start building a response.
-     *
-     * @param  \Illuminate\Support\Collection|array $data
-     * @param  \League\Fractal\TransformerAbstract $transformer
-     * @param  \Closure $callback
-     * @return $this
-     */
-    public function paginator(LengthAwarePaginator $data, TransformerAbstract $transformer, callable $callback = null)
-    {
-        $fractal = fractal()->collection($data->getCollection(), $transformer)
-            ->serializeWith(new ArraySerializer)
-            ->paginateWith(new IlluminatePaginatorAdapter($data));
-
-        return $this->fractalResponse($fractal, $callback);
-    }
-
-    /**
      * Bind an data to a transformer and start building a response.
      *
      * @param  mixed $data
      * @param  \League\Fractal\TransformerAbstract $transformer
-     * @param  \Closure $callback
+     * @param  \League\Fractal\Serializer\SerializerAbstract|callable|null $serializer
+     * @param  callable|null $callback
      * @return $this
      */
-    public function transform($data, TransformerAbstract $transformer, callable $callback = null)
+    public function fractal($data, TransformerAbstract $transformer, $serializer = null, callable $callback = null)
     {
+        $fractal = fractal($data, $transformer);
+
         if ($data instanceof LengthAwarePaginator) {
-            return $this->paginator($data, $transformer, $callback);
+            $fractal->paginateWith(new IlluminatePaginatorAdapter($data));
         }
 
-        return $this->fractalResponse(fractal($data, $transformer), $callback);
+        if (is_callable($serializer)) {
+            return $this->fractalResponse($fractal, $serializer);
+        }
+
+        if ($serializer instanceof SerializerAbstract) {
+            $fractal->serializeWith($serializer);
+        }
+
+        return $this->fractalResponse($fractal, $callback);
     }
 
     /**
@@ -226,8 +194,8 @@ class Response extends IlluminateResponse
     protected function fractalResponse(Fractal $fractal, callable $callback = null)
     {
         if ($callback) {
-            // $fractal = $callback($fractal);
-            return $callback($fractal);
+            $fractal = $callback($fractal);
+            // return $callback($fractal);
         }
 
         $this->setContent($fractal->toArray());

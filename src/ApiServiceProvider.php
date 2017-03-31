@@ -2,6 +2,7 @@
 
 namespace Jenky\LaravelAPI;
 
+use Barryvdh\Cors\ServiceProvider as CorsServiceProvider;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +29,7 @@ class ApiServiceProvider extends ServiceProvider
     {
         $this->app[Kernel::class]->prependMiddleware(Request::class);
         $this->app->register(FractalServiceProvider::class);
+        $this->app->register(CorsServiceProvider::class);
     }
 
     /**
@@ -121,7 +123,7 @@ class ApiServiceProvider extends ServiceProvider
         $methods = [
             'created', 'accepted', 'noContent',
             'error', 'badRequest', 'unauthorized', 'forbidden', 'notFound', 'unprocessable', 'internalError',
-            'item', 'collection', 'paginator', 'transform',
+            'fractal',
         ];
 
         foreach ($methods as $method) {
