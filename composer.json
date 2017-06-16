@@ -38,10 +38,17 @@
         "test": "phpunit"
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "2.0-dev",
+            "dev-develop": "3.0-dev"
+        },
         "laravel": {
             "providers": [
                 "Jenky\\LaravelAPI\\ApiServiceProvider"
             ]
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
