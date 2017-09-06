@@ -40,6 +40,7 @@ protected function mapApiRoutes()
 #### Create routes
 
 **Route::api($version, array $options, $callback)**
+
 The `options` parameter can be omitted from the method.
 
 ```php
