@@ -18,6 +18,25 @@ php artisan vendor:publish --provider="Jenky\LaravelAPI\ApiServiceProvider"
 ```
 
 ## Usage
+#### Note
+Please remove the `api` prefix in the `mapApiRoutes` method from `App\Provivers\RouteServiceProvider`
+```php
+/**
+ * Define the "api" routes for the application.
+ *
+ * These routes are typically stateless.
+ *
+ * @return void
+ */
+protected function mapApiRoutes()
+{
+    Route::middleware('api')
+         // ->prefix('api') Remove or comment this line.
+         ->namespace($this->namespace)
+         ->group(base_path('routes/api.php'));
+}
+```
+
 ##### Create routes
 
 **Route::api($version, $callback)**
