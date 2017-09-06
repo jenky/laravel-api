@@ -41,7 +41,7 @@ protected function mapApiRoutes()
 
 **Route::api($version, array $options, $callback)**
 
-The `options` parameter can be omitted from the method.
+The `$options` parameter can be omitted from the method.
 
 ```php
 Route::api('v1', [
