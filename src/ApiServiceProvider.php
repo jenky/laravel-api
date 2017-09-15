@@ -2,7 +2,6 @@
 
 namespace Jenky\LaravelAPI;
 
-use Barryvdh\Cors\ServiceProvider as CorsServiceProvider;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
@@ -16,7 +15,6 @@ use Jenky\LaravelAPI\Http\Routing\Router;
 use Jenky\LaravelAPI\Http\Validator\Domain;
 use Jenky\LaravelAPI\Http\Validator\Prefix;
 use RuntimeException;
-use Spatie\Fractal\FractalServiceProvider;
 
 class ApiServiceProvider extends ServiceProvider
 {
@@ -28,8 +26,6 @@ class ApiServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app[Kernel::class]->prependMiddleware(Request::class);
-        $this->app->register(FractalServiceProvider::class);
-        $this->app->register(CorsServiceProvider::class);
     }
 
     /**
