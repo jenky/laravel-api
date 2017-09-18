@@ -9,20 +9,11 @@ use Illuminate\Foundation\Exceptions\Handler as IlluminateExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Jenky\LaravelAPI\Contracts\Debug\ExceptionHandler;
-use ReflectionFunction;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler extends IlluminateExceptionHandler implements ExceptionHandler, ExceptionHandlerContract
 {
-    /**
-     * Array of exception handlers.
-     *
-     * @var array
-     */
-    protected $handlers = [];
-
     /**
      * User defined replacements to merge with defaults.
      *
@@ -31,50 +22,20 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
     protected $replacements = [];
 
     /**
-     * Prepare exception for rendering.
+     * Indicates that error trace should be string instead of array.
      *
-     * @param  \Exception  $e
-     * @return \Exception
+     * @var bool
      */
-    protected function prepareException(Exception $e)
-    {
-        $e = parent::prepareException($e);
-
-        if ($e instanceof AuthenticationException) {
-            $e = new HttpException(401, $e->getMessage());
-        }
-
-        foreach ($this->handlers as $hint => $handler) {
-            if (! $e instanceof $hint) {
-                continue;
-            }
-
-            if ($response = $handler($e, $this)) {
-                if ($response instanceof Response) {
-                    return $response;
-                }
-            }
-        }
-
-        return $e;
-    }
+    protected static $getTraceAsString = false;
 
     /**
-     * Prepare response containing exception render.
+     * Disable wrapping of the outer-most resource array.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Exception $exception
-     * @return \Illuminate\Http\Response
+     * @return void
      */
-    protected function prepareResponse($request, Exception $exception)
+    public static function getTraceAsString($bool = true)
     {
-        $response = $this->toResponse($exception);
-
-        if ($this->container->bound(\Barryvdh\Cors\Stack\CorsService::class)) {
-            $this->container[\Barryvdh\Cors\Stack\CorsService::class]->addActualRequestHeaders($response, $request);
-        }
-
-        return $response;
+        static::$getTraceAsString = $bool;
     }
 
     /**
@@ -86,7 +47,7 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
      */
     protected function unauthenticated($request, AuthenticationException $e)
     {
-        return $this->toResponse($e);
+        return $this->toResponse($e, 401);
     }
 
     /**
@@ -98,18 +59,63 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
-        return $this->toResponse($e);
+        if ($e->response) {
+            return $e->response;
+        }
+
+        return $this->toResponse($e, $e->status);
+    }
+
+    /**
+     * Prepare a response for the given exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Exception $e
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function prepareResponse($request, Exception $e)
+    {
+        return $this->addCorsHeaders($this->toResponse($e));
+    }
+
+    /**
+     * Prepare a JSON response for the given exception.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Exception $e
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function prepareJsonResponse($request, Exception $e)
+    {
+        return $this->addCorsHeaders($this->toResponse($e));
+    }
+
+    /**
+     * Add cors to response headers.
+     *
+     * @param \Symfony\Component\HttpFoundation\Response $response
+     * @param \Illuminate\Http\Request $request
+     */
+    protected function addCorsHeaders($response, $request)
+    {
+        if ($this->container->bound(\Barryvdh\Cors\Stack\CorsService::class)) {
+            $response = $this->container[\Barryvdh\Cors\Stack\CorsService::class]->addActualRequestHeaders($response, $request);
+        }
+
+        return $response;
     }
 
     /**
      * Map exception into an JSON response.
      *
      * @param  \Exception $e
+     * @param  null|int $statusCode
+     * @param  array $headers
      * @return \Illuminate\Http\Response
      */
-    protected function toResponse(Exception $exception)
+    protected function toResponse(Exception $exception, $statusCode = null, array $headers = [])
     {
-        $replacements = $this->prepareReplacements($exception);
+        $replacements = $this->prepareReplacements($exception, $statusCode, $headers);
         $response = $this->getErrorFormat();
 
         array_walk_recursive($response, function (&$value, $key) use ($exception, $replacements) {
@@ -126,12 +132,14 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
     /**
      * Prepare the replacements array by gathering the keys and values.
      *
-     * @param \Exception $exception
+     * @param  \Exception $exception
+     * @param  null|int $statusCode
+     * @param  array $headers
      * @return array
      */
-    protected function prepareReplacements(Exception &$exception)
+    protected function prepareReplacements(Exception &$exception, $statusCode = null, array $headers = [])
     {
-        $e = FlattenException::create($exception);
+        $e = FlattenException::create($exception, $statusCode, $headers);
         $replacements = [];
         $statusCode = $e->getStatusCode();
 
@@ -141,23 +149,16 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
 
         if ($exception instanceof ValidationException) {
             $validator = $exception->validator;
-            $statusCode = 422;
-            $e->setStatusCode($statusCode);
 
             if (! $validator->errors()->isEmpty()) {
                 $replacements[':errors'] = $validator->errors();
             }
         }
 
-        if ($exception instanceof ExceptionWithError) {
-            if ($exception->hasErrors()) {
-                $replacements[':errors'] = $exception->getErrors();
-            }
-        }
-
         $replacements += [
             ':message' => $message,
             ':status_code' => $statusCode,
+            ':type' => class_basename($e->getClass()),
         ];
 
         if ($code = $e->getCode()) {
@@ -169,7 +170,7 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
                 'class' => $e->getClass(),
-                'trace' => explode("\n", $exception->getTraceAsString()),
+                'trace' => static::$getTraceAsString ? explode("\n", $exception->getTraceAsString()) : $e->getTrace(),
             ];
         }
 
@@ -202,35 +203,6 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
     }
 
     /**
-     * Register a new exception handler.
-     *
-     * @param  callable $callback
-     * @return void
-     */
-    public function register(callable $callback)
-    {
-        $hint = $this->handlerHint($callback);
-
-        $this->handlers[$hint] = $callback;
-    }
-
-    /**
-     * Get the hint for an exception handler.
-     *
-     * @param callable $callback
-     *
-     * @return string
-     */
-    protected function handlerHint(callable $callback)
-    {
-        $reflection = new ReflectionFunction($callback);
-
-        $exception = $reflection->getParameters()[0];
-
-        return $exception->getClass()->getName();
-    }
-
-    /**
      * Determines if we are running in debug mode.
      *
      * @return bool
@@ -249,24 +221,12 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
     {
         return $this->container['config']->get('api.errorFormat', [
             'message' => ':message',
+            'type' => ':type',
             'status_code' => ':status_code',
             'errors' => ':errors',
             'code' => ':code',
             'debug' => ':debug',
         ]);
-    }
-
-    /**
-     * Set the error format array.
-     *
-     * @param  array $format
-     * @return $this
-     */
-    public function setErrorFormat(array $format)
-    {
-        // $this->format = $format;
-
-        return $this;
     }
 
     /**
