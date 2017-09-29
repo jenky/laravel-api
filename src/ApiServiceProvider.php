@@ -5,7 +5,6 @@ namespace Jenky\LaravelAPI;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
-use Jenky\LaravelAPI\Contracts\Debug\ExceptionHandler;
 use Jenky\LaravelAPI\Contracts\Http\Parser;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Http\AcceptParser;
@@ -19,16 +18,6 @@ use RuntimeException;
 class ApiServiceProvider extends ServiceProvider
 {
     /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->app[Kernel::class]->prependMiddleware(Request::class);
-    }
-
-    /**
      * Register any application services.
      *
      * @return void
@@ -39,12 +28,6 @@ class ApiServiceProvider extends ServiceProvider
 
         $this->app->singleton(Validator::class, function () {
             return $this->createRequestValidator();
-        });
-
-        $this->app->singleton(ExceptionHandler::class, function ($app) {
-            $handler = $this->config('handlers.exception');
-
-            return new $handler($app);
         });
 
         $this->app->singleton(Parser::class, function ($app) {

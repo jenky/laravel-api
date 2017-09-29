@@ -3,31 +3,13 @@
 namespace Jenky\LaravelAPI\Exception;
 
 use Exception;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
-use Illuminate\Foundation\Exceptions\Handler as IlluminateExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
-use Jenky\LaravelAPI\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
 
-class Handler extends IlluminateExceptionHandler implements ExceptionHandler, ExceptionHandlerContract
+trait FormatsException
 {
-    /**
-     * User defined replacements to merge with defaults.
-     *
-     * @var array
-     */
-    protected $replacements = [];
-
-    /**
-     * Indicates that error trace should be string instead of array.
-     *
-     * @var bool
-     */
-    protected static $getTraceAsString = false;
-
     /**
      * Disable wrapping of the outer-most resource array.
      *
@@ -39,70 +21,13 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
     }
 
     /**
-     * Convert an authentication exception into an unauthenticated response.
+     * Get trace as string option.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Illuminate\Auth\AuthenticationException $e
-     * @return \Illuminate\Http\Response
+     * @return bool
      */
-    protected function unauthenticated($request, AuthenticationException $e)
+    protected function traceAsString()
     {
-        return $this->toResponse($e, 401);
-    }
-
-    /**
-     * Create a response object from the given validation exception.
-     *
-     * @param  \Illuminate\Validation\ValidationException $e
-     * @param  \Illuminate\Http\Request $request
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function convertValidationExceptionToResponse(ValidationException $e, $request)
-    {
-        if ($e->response) {
-            return $e->response;
-        }
-
-        return $this->toResponse($e, $e->status);
-    }
-
-    /**
-     * Prepare a response for the given exception.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception $e
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function prepareResponse($request, Exception $e)
-    {
-        return $this->addCorsHeaders($this->toResponse($e));
-    }
-
-    /**
-     * Prepare a JSON response for the given exception.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception $e
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function prepareJsonResponse($request, Exception $e)
-    {
-        return $this->addCorsHeaders($this->toResponse($e));
-    }
-
-    /**
-     * Add cors to response headers.
-     *
-     * @param \Symfony\Component\HttpFoundation\Response $response
-     * @param \Illuminate\Http\Request $request
-     */
-    protected function addCorsHeaders($response, $request)
-    {
-        if ($this->container->bound(\Barryvdh\Cors\Stack\CorsService::class)) {
-            $response = $this->container[\Barryvdh\Cors\Stack\CorsService::class]->addActualRequestHeaders($response, $request);
-        }
-
-        return $response;
+        return defined('static::getTraceAsString') ? static::getTraceAsString : false;
     }
 
     /**
@@ -113,7 +38,7 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
      * @param  array $headers
      * @return \Illuminate\Http\Response
      */
-    protected function toResponse(Exception $exception, $statusCode = null, array $headers = [])
+    public function toJsonResponse(Exception $exception, $statusCode = null, array $headers = [])
     {
         $replacements = $this->prepareReplacements($exception, $statusCode, $headers);
         $response = $this->getErrorFormat();
@@ -170,13 +95,13 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
                 'class' => $e->getClass(),
-                'trace' => static::$getTraceAsString ? explode("\n", $exception->getTraceAsString()) : $e->getTrace(),
+                'trace' => $this->traceAsString() ? explode("\n", $exception->getTraceAsString()) : $e->getTrace(),
             ];
         }
 
         $exception = $e;
 
-        return array_merge($replacements, $this->replacements);
+        return array_merge($replacements, $this->getReplacements());
     }
 
     /**
@@ -227,6 +152,16 @@ class Handler extends IlluminateExceptionHandler implements ExceptionHandler, Ex
             'code' => ':code',
             'debug' => ':debug',
         ]);
+    }
+
+    /**
+     * Get user defined replacements.
+     *
+     * @return array
+     */
+    public function getReplacements()
+    {
+        return property_exists($this, 'replacements') ? $this->replacements : [];
     }
 
     /**
