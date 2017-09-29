@@ -112,19 +112,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | API class handlers.
-    |--------------------------------------------------------------------------
-    |
-    | Here are each of the class handlers for the each exception.
-    |
-    */
-
-    'handlers' => [
-        'exception' => Jenky\LaravelAPI\Exception\Handler::class,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Generic Error Format
     |--------------------------------------------------------------------------
     |
@@ -144,4 +131,5 @@ return [
         'debug' => ':debug',
     ],
 
+    'trace_as_string' => false,
 ];

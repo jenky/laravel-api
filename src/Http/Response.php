@@ -8,7 +8,6 @@ use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Serializer\SerializerAbstract;
 use League\Fractal\TransformerAbstract;
 use Spatie\Fractal\Fractal;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Response extends IlluminateResponse
 {
@@ -72,88 +71,16 @@ class Response extends IlluminateResponse
     }
 
     /**
-     * Return an error response.
+     * Return an error.
      *
      * @param  string $message
-     * @param  int $statusCode
+     * @param  array $headers
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @return void
      */
-    public function error($message, $statusCode)
+    public function error($code = 500, $message = 'Server error', array $headers = [])
     {
-        throw new HttpException($statusCode, $message);
-    }
-
-    /**
-     * Return a 400 bad request error.
-     *
-     * @param  string $message
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @return void
-     */
-    public function badRequest($message = 'Bad Request')
-    {
-        return $this->error($message, 400);
-    }
-
-    /**
-     * Return a 401 unauthorized error.
-     *
-     * @param  string $message
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @return void
-     */
-    public function unauthorized($message = 'Unauthorized')
-    {
-        return $this->error($message, 401);
-    }
-
-    /**
-     * Return a 403 forbidden error.
-     *
-     * @param  string $message
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @return void
-     */
-    public function forbidden($message = 'Forbidden')
-    {
-        return $this->error($message, 403);
-    }
-
-    /**
-     * Return a 404 not found error.
-     *
-     * @param  string $message
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @return void
-     */
-    public function notFound($message = 'Not Found')
-    {
-        return $this->error($message, 404);
-    }
-
-    /**
-     * Return a 422 unprocessable entity error.
-     *
-     * @param  string $message
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @return void
-     */
-    public function unprocessable($message = 'Unprocessable Entity')
-    {
-        return $this->error($message, 422);
-    }
-
-    /**
-     * Return a 500 internal server error.
-     *
-     * @param  string $message
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @return void
-     */
-    public function internalError($message = 'Internal Error')
-    {
-        return $this->error($message, 500);
+        return abort($code, $message, $headers);
     }
 
     /**

@@ -11,26 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 trait FormatsException
 {
     /**
-     * Disable wrapping of the outer-most resource array.
-     *
-     * @return void
-     */
-    public static function getTraceAsString($bool = true)
-    {
-        static::$getTraceAsString = $bool;
-    }
-
-    /**
-     * Get trace as string option.
-     *
-     * @return bool
-     */
-    protected function traceAsString()
-    {
-        return defined('static::getTraceAsString') ? static::getTraceAsString : false;
-    }
-
-    /**
      * Map exception into an JSON response.
      *
      * @param  \Exception $e
@@ -95,7 +75,7 @@ trait FormatsException
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
                 'class' => $e->getClass(),
-                'trace' => $this->traceAsString() ? explode("\n", $exception->getTraceAsString()) : $e->getTrace(),
+                'trace' => config('api.trace_as_string') ? explode("\n", $exception->getTraceAsString()) : $e->getTrace(),
             ];
         }
 
@@ -134,7 +114,7 @@ trait FormatsException
      */
     protected function runningInDebugMode()
     {
-        return $this->container['config']->get('app.debug', false);
+        return config('app.debug', false);
     }
 
     /**
@@ -144,7 +124,7 @@ trait FormatsException
      */
     protected function getErrorFormat()
     {
-        return $this->container['config']->get('api.errorFormat', [
+        return config('api.errorFormat', [
             'message' => ':message',
             'type' => ':type',
             'status_code' => ':status_code',

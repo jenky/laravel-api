@@ -13,6 +13,11 @@ trait ExceptionResponse
     use FormatsException;
 
     /**
+     * @var bool
+     */
+    protected static $isApiRequest;
+
+    /**
      * Check if request is from API.
      *
      * @param  \Illuminate\Http\Request $request
@@ -20,7 +25,11 @@ trait ExceptionResponse
      */
     public function isApiRequest($request)
     {
-        return $this->container[Validator::class]->validate($request);
+        if (is_null(static::$isApiRequest)) {
+            static::$isApiRequest = $this->container[Validator::class]->validate($request);
+        }
+
+        return static::$isApiRequest;
     }
 
     /**
@@ -33,7 +42,7 @@ trait ExceptionResponse
     protected function unauthenticated($request, AuthenticationException $e)
     {
         return $this->isApiRequest($request)
-            ? $this->toJsonResponse($e, 401)
+            ? $this->addCorsHeaders($this->toJsonResponse($e, 401), $request)
             : parent::unauthenticated($request, $e);
     }
 
@@ -47,7 +56,7 @@ trait ExceptionResponse
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
         return $this->isApiRequest($request)
-            ? $this->toJsonResponse($e, $e->status)
+            ? $this->addCorsHeaders($this->toJsonResponse($e, $e->status), $request)
             : parent::convertValidationExceptionToResponse($e, $request);
     }
 
@@ -87,8 +96,8 @@ trait ExceptionResponse
      */
     public function addCorsHeaders($response, $request)
     {
-        if ($this->container->bound(\Barryvdh\Cors\Stack\CorsService::class)) {
-            $response = $this->container[\Barryvdh\Cors\Stack\CorsService::class]->addActualRequestHeaders($response, $request);
+        if ($this->container->bound(\Barryvdh\Cors\CorsService::class)) {
+            $response = $this->container[\Barryvdh\Cors\CorsService::class]->addActualRequestHeaders($response, $request);
         }
 
         return $response;

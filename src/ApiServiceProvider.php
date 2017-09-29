@@ -2,7 +2,6 @@
 
 namespace Jenky\LaravelAPI;
 
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 use Jenky\LaravelAPI\Contracts\Http\Parser;
@@ -101,8 +100,7 @@ class ApiServiceProvider extends ServiceProvider
 
         $methods = [
             'created', 'accepted', 'noContent',
-            'error', 'badRequest', 'unauthorized', 'forbidden', 'notFound', 'unprocessable', 'internalError',
-            'fractal',
+            'error', 'fractal',
         ];
 
         foreach ($methods as $method) {
