@@ -5,32 +5,11 @@ namespace Jenky\LaravelAPI\Exception;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
-use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Symfony\Component\HttpFoundation\Response;
 
 trait ExceptionResponse
 {
     use FormatsException;
-
-    /**
-     * @var bool
-     */
-    protected static $isApiRequest;
-
-    /**
-     * Check if request is from API.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return bool
-     */
-    public function isApiRequest($request)
-    {
-        if (is_null(static::$isApiRequest)) {
-            static::$isApiRequest = $this->container[Validator::class]->validate($request);
-        }
-
-        return static::$isApiRequest;
-    }
 
     /**
      * Convert an authentication exception into an unauthenticated response.
@@ -41,7 +20,7 @@ trait ExceptionResponse
      */
     protected function unauthenticated($request, AuthenticationException $e)
     {
-        return $this->isApiRequest($request)
+        return $request->isApi()
             ? $this->addCorsHeaders($this->toJsonResponse($e, 401), $request)
             : parent::unauthenticated($request, $e);
     }
@@ -55,7 +34,7 @@ trait ExceptionResponse
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
-        return $this->isApiRequest($request)
+        return $request->isApi()
             ? $this->addCorsHeaders($this->toJsonResponse($e, $e->status), $request)
             : parent::convertValidationExceptionToResponse($e, $request);
     }
@@ -69,7 +48,7 @@ trait ExceptionResponse
      */
     protected function prepareResponse($request, Exception $e)
     {
-        return $this->isApiRequest($request)
+        return $request->isApi()
             ? $this->addCorsHeaders($this->toJsonResponse($e), $request)
             : parent::prepareResponse($request, $e);
     }
@@ -83,7 +62,7 @@ trait ExceptionResponse
      */
     protected function prepareJsonResponse($request, Exception $e)
     {
-        return $this->isApiRequest($request)
+        return $request->isApi()
             ? $this->addCorsHeaders($this->toJsonResponse($e), $request)
             : parent::prepareJsonResponse($request, $e);
     }

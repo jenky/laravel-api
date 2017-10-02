@@ -33,6 +33,7 @@ class ApiServiceProvider extends ServiceProvider
             return new AcceptParser($this->config('standardsTree'), $this->config('subtype'), $this->config('version'), 'json');
         });
 
+        $this->registerRequestMacros();
         $this->registerResponseMacros();
         $this->registerRouterMacros();
     }
@@ -85,6 +86,20 @@ class ApiServiceProvider extends ServiceProvider
                 throw new RuntimeException('Missing API scheme configuaration.');
                 break;
         }
+    }
+
+    /**
+     * Register request macros.
+     *
+     * @return void
+     */
+    protected function registerRequestMacros()
+    {
+        $validator = $this->app->make(Validator::class);
+
+        $this->app['request']->macro('isApi', function () use ($validator) {
+            return $validator->validate($this);
+        });
     }
 
     /**
