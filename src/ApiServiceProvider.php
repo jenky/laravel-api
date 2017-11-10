@@ -2,11 +2,8 @@
 
 namespace Jenky\LaravelAPI;
 
-use Barryvdh\Cors\ServiceProvider as CorsServiceProvider;
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
-use Jenky\LaravelAPI\Contracts\Debug\ExceptionHandler;
 use Jenky\LaravelAPI\Contracts\Http\Parser;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Http\AcceptParser;
@@ -16,22 +13,9 @@ use Jenky\LaravelAPI\Http\Routing\Router;
 use Jenky\LaravelAPI\Http\Validator\Domain;
 use Jenky\LaravelAPI\Http\Validator\Prefix;
 use RuntimeException;
-use Spatie\Fractal\FractalServiceProvider;
 
 class ApiServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        $this->app[Kernel::class]->prependMiddleware(Request::class);
-        $this->app->register(FractalServiceProvider::class);
-        $this->app->register(CorsServiceProvider::class);
-    }
-
     /**
      * Register any application services.
      *
@@ -45,16 +29,11 @@ class ApiServiceProvider extends ServiceProvider
             return $this->createRequestValidator();
         });
 
-        $this->app->singleton(ExceptionHandler::class, function ($app) {
-            $handler = $this->config('handlers.exception');
-
-            return new $handler($app);
-        });
-
         $this->app->singleton(Parser::class, function ($app) {
             return new AcceptParser($this->config('standardsTree'), $this->config('subtype'), $this->config('version'), 'json');
         });
 
+        $this->registerRequestMacros();
         $this->registerResponseMacros();
         $this->registerRouterMacros();
     }
@@ -110,6 +89,20 @@ class ApiServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register request macros.
+     *
+     * @return void
+     */
+    protected function registerRequestMacros()
+    {
+        $validator = $this->app->make(Validator::class);
+
+        $this->app['request']->macro('isApi', function () use ($validator) {
+            return $validator->validate($this);
+        });
+    }
+
+    /**
      * Register response macros.
      *
      * @return void
@@ -122,8 +115,7 @@ class ApiServiceProvider extends ServiceProvider
 
         $methods = [
             'created', 'accepted', 'noContent',
-            'error', 'badRequest', 'unauthorized', 'forbidden', 'notFound', 'unprocessable', 'internalError',
-            'fractal',
+            'error',
         ];
 
         foreach ($methods as $method) {
