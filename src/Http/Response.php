@@ -3,9 +3,6 @@
 namespace Jenky\LaravelAPI\Http;
 
 use Illuminate\Http\Response as IlluminateResponse;
-use League\Fractal\Serializer\SerializerAbstract;
-use League\Fractal\TransformerAbstract;
-use Spatie\Fractal\Fractal;
 
 class Response extends IlluminateResponse
 {
@@ -79,48 +76,5 @@ class Response extends IlluminateResponse
     public function error($code = 500, $message = 'Server error', array $headers = [])
     {
         return abort($code, $message, $headers);
-    }
-
-    /**
-     * Bind an data to a transformer and start building a response.
-     *
-     * @param  mixed $data
-     * @param  \League\Fractal\TransformerAbstract $transformer
-     * @param  \League\Fractal\Serializer\SerializerAbstract|callable|null $serializer
-     * @param  callable|null $callback
-     * @return $this
-     */
-    public function fractal($data, TransformerAbstract $transformer, $serializer = null, callable $callback = null)
-    {
-        $fractal = fractal($data, $transformer);
-
-        if (is_callable($serializer)) {
-            return $this->fractalResponse($fractal, $serializer);
-        }
-
-        if ($serializer instanceof SerializerAbstract) {
-            $fractal->serializeWith($serializer);
-        }
-
-        return $this->fractalResponse($fractal, $callback);
-    }
-
-    /**
-     * Get fractal JSON response.
-     *
-     * @param  \Spatie\Fractal\Fractal $fractal
-     * @param  callable|null $callback
-     * @return $this
-     */
-    protected function fractalResponse(Fractal $fractal, callable $callback = null)
-    {
-        if ($callback) {
-            $fractal = $callback($fractal);
-            // return $callback($fractal);
-        }
-
-        $this->setContent($fractal->toArray());
-
-        return $this;
     }
 }
