@@ -77,7 +77,7 @@ class FractalResponse implements Responsable
     /**
      * Get the headers for the response.
      *
-     * @return int
+     * @return array
      */
     public function headers()
     {
