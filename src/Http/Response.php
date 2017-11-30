@@ -71,12 +71,13 @@ class Response extends IlluminateResponse
     /**
      * Return an error.
      *
-     * @param  string $message
+     * @param  int $code
+     * @param  string|null $message
      * @param  array $headers
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @return void
      */
-    public function error($code = 500, $message = 'Server error', array $headers = [])
+    public function error($code = 500, $message = null, array $headers = [])
     {
         return abort($code, $message, $headers);
     }
