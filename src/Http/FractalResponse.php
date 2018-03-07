@@ -2,12 +2,10 @@
 
 namespace Jenky\LaravelAPI\Http;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
-use League\Fractal\Serializer\ArraySerializer;
 use League\Fractal\Serializer\SerializerAbstract;
 use League\Fractal\TransformerAbstract;
 
@@ -50,10 +48,6 @@ class FractalResponse implements Responsable
      */
     public function __construct($resource, TransformerAbstract $transformer, SerializerAbstract $serializer = null)
     {
-        if ($resource instanceof LengthAwarePaginator && is_null($serializer)) {
-            $serializer = new ArraySerializer;
-        }
-
         $this->transformer = $transformer;
         $this->serializer = $serializer;
         $this->resource = tap($resource, function ($data) {
