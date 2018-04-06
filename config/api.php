@@ -131,5 +131,8 @@ return [
         'debug' => ':debug',
     ],
 
-    'trace_as_string' => false,
+    'trace' => [
+        'as_string' => false,
+        'include_args' => false,
+    ],
 ];
