@@ -4,6 +4,7 @@ namespace Jenky\LaravelAPI\Exception;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,7 +32,7 @@ trait FormatsException
 
         $response = $this->removeEmptyReplacements($response);
 
-        return new JsonResponse($response, $exception->getStatusCode(), $exception->getHeaders());
+        return new JsonResponse($response, $exception->getStatusCode(), $exception->getHeaders(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     }
 
     /**
@@ -75,7 +76,13 @@ trait FormatsException
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
                 'class' => $e->getClass(),
-                'trace' => config('api.trace_as_string') ? explode("\n", $exception->getTraceAsString()) : $e->getTrace(),
+                'trace' => config('api.trace.as_string', false)
+                    ? explode("\n", $exception->getTraceAsString())
+                    : config('api.trace.include_args', false)
+                        ? $e->getTrace()
+                        : collect($e->getTrace())->map(function ($trace) {
+                            return Arr::except($trace, ['args']);
+                        })->all(),
             ];
         }
 
