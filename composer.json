@@ -47,7 +47,8 @@
     },
     "suggest": {
        "barryvdh/laravel-cors": "Adds CORS (Cross-Origin Resource Sharing) headers support in your Laravel application.",
-       "spatie/laravel-fractal": "An easy to use Fractal wrapper built for Laravel applications."
+       "spatie/laravel-fractal": "An easy to use Fractal wrapper built for Laravel applications.",
+       "spatie/laravel-query-builder": "Easily build Eloquent queries from API requests."
     },
     "config": {
         "sort-packages": true
