@@ -52,7 +52,7 @@ class Router
      * Create API route group.
      *
      * @param  string $version
-     * @param  string[] $args
+     * @param  string[] ...$args
      * @return void|\Illuminate\Contracts\Routing\Registrar
      */
     public function register($version, ...$args)

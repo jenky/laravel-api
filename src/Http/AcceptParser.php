@@ -71,7 +71,7 @@ class AcceptParser implements Parser
                 throw new BadRequestHttpException('Accept header could not be properly parsed because of a strict matching process.');
             }
 
-            $default = 'application/'.$this->standardsTree.'.'.$this->subtype.'.'.$this->version.'+'.$this->format;
+            $default = sprintf('application/%s.%s.%s+%s', $this->standardsTree, $this->subtype, $this->version, $this->format);
 
             preg_match($pattern, $default, $matches);
         }
