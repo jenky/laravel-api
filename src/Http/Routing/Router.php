@@ -107,7 +107,7 @@ class Router
      *
      * @param  string $version
      * @param  array $attributes
-     * @return array
+     * @return array|null
      */
     protected function mergeRouteAttributes($version, array $attributes)
     {
