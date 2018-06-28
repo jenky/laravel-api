@@ -7,7 +7,6 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RouteRegistrar;
-use InvalidArgumentException;
 use Jenky\LaravelAPI\Contracts\Http\Parser;
 
 class Router
@@ -59,6 +58,10 @@ class Router
     public function register($version, ...$args)
     {
         list($attributes, $callback) = $this->parseRouteParameters($version, $args);
+
+        if (! is_array($attributes)) {
+            return;
+        }
 
         if ($callback) {
             return $this->router->group($attributes, $callback);
@@ -129,8 +132,7 @@ class Router
 
             case 'header':
                 if ($version != $this->getVersionFromRequest()) {
-                    // return false;
-                    // Strict check and throw exception
+                    return;
                 }
                 break;
         }
