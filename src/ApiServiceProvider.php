@@ -7,8 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Jenky\LaravelAPI\Contracts\Http\Parser;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Http\AcceptParser;
-use Jenky\LaravelAPI\Http\Middleware\Request;
-use Jenky\LaravelAPI\Http\Response as ApiResponse;
+use Jenky\LaravelAPI\Http\ResponseMixins;
 use Jenky\LaravelAPI\Http\Routing\Router;
 use Jenky\LaravelAPI\Http\Validator\Domain;
 use Jenky\LaravelAPI\Http\Validator\Prefix;
@@ -109,22 +108,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerResponseMacros()
     {
-        Response::macro('api', function () {
-            return new ApiResponse;
-        });
-
-        $methods = [
-            'created', 'accepted', 'noContent',
-            'error',
-        ];
-
-        foreach ($methods as $method) {
-            if (! Response::hasMacro($method)) {
-                Response::macro($method, function () use ($method) {
-                    return call_user_func_array([$this->api(), $method], func_get_args());
-                });
-            }
-        }
+        Response::mixin(new ResponseMixins);
     }
 
     /**
@@ -136,8 +120,8 @@ class ApiServiceProvider extends ServiceProvider
     {
         $router = $this->app->make(Router::class);
 
-        $this->app['router']->macro('api', function ($version, $first, $second = null) use ($router) {
-            return $router->create($version, $first, $second);
+        $this->app['router']->macro('api', function ($version, ...$args) use ($router) {
+            return $router->register($version, ...$args);
         });
     }
 }
