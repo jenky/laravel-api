@@ -120,8 +120,8 @@ class ApiServiceProvider extends ServiceProvider
     {
         $router = $this->app->make(Router::class);
 
-        $this->app['router']->macro('api', function ($version, $first, $second = null) use ($router) {
-            return $router->create($version, $first, $second);
+        $this->app['router']->macro('api', function ($version, ...$args) use ($router) {
+            return $router->register($version, ...$args);
         });
     }
 }

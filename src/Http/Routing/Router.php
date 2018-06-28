@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Http\Request;
+use Illuminate\Routing\RouteRegistrar;
 use InvalidArgumentException;
 use Jenky\LaravelAPI\Contracts\Http\Parser;
 
@@ -52,39 +53,47 @@ class Router
      * Create API route group.
      *
      * @param  string $version
-     * @param  array|\Closure $first
-     * @param  null|\Closure $second
-     * @return void
+     * @param  string[] $args
+     * @return void|\Illuminate\Contracts\Routing\Registrar
      */
-    public function create($version, $first, $second = null)
+    public function register($version, ...$args)
     {
-        list($attributes, $callback) = $this->parseRouteParameters($version, $first, $second);
+        list($attributes, $callback) = $this->parseRouteParameters($version, $args);
 
-        if (! is_array($attributes)) {
-            return;
+        if ($callback) {
+            return $this->router->group($attributes, $callback);
         }
 
-        return $this->router->group($attributes, $callback);
+        $router = new RouteRegistrar($this->router);
+
+        foreach ($attributes as $key => $value) {
+            $router->attribute($key, $value);
+        }
+
+        return $router;
     }
 
     /**
      * Parse the parameters to pass to router.
      *
      * @param  string $version
-     * @param  array|\Closure $first
-     * @param  null|\Closure $second
+     * @param  array $args
      * @return array
      */
-    protected function parseRouteParameters($version, $first, $second = null)
+    protected function parseRouteParameters($version, array $args)
     {
-        if ($first instanceof Closure) {
-            $attributes = $this->mergeRouteAttributes($version, []);
-            $callback = $first;
-        } elseif (is_array($first) && ($second instanceof Closure)) {
-            $attributes = $this->mergeRouteAttributes($version, $first);
-            $callback = $second;
-        } else {
-            throw new InvalidArgumentException('The parameters are invalid.');
+        $attributes = $this->mergeRouteAttributes($version, []);
+        $callback = null;
+
+        foreach ($args as $arg) {
+            if (is_array($arg)) {
+                $attributes = $this->mergeRouteAttributes($version, $arg);
+            }
+
+            if ($arg instanceof Closure) {
+                $callback = $arg;
+                break;
+            }
         }
 
         return [$attributes, $callback];
@@ -95,7 +104,7 @@ class Router
      *
      * @param  string $version
      * @param  array $attributes
-     * @return array|bool
+     * @return array
      */
     protected function mergeRouteAttributes($version, array $attributes)
     {
@@ -120,7 +129,8 @@ class Router
 
             case 'header':
                 if ($version != $this->getVersionFromRequest()) {
-                    return false;
+                    // return false;
+                    // Strict check and throw exception
                 }
                 break;
         }
