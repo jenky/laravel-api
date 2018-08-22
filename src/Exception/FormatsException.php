@@ -46,12 +46,13 @@ trait FormatsException
     protected function prepareReplacements(Exception &$exception, $statusCode = null, array $headers = [])
     {
         $e = FlattenException::create($exception, $statusCode, $headers);
-        $replacements = [];
         $statusCode = $e->getStatusCode();
 
-        if (! $message = $e->getMessage()) {
-            $message = array_get(Response::$statusTexts, $statusCode);
-        }
+        $replacements = [
+            ':message' => $e->getMessage() ?: Arr::get(Response::$statusTexts, $statusCode),
+            ':status_code' => $statusCode,
+            ':type' => class_basename($e->getClass()),
+        ];
 
         if ($exception instanceof ValidationException) {
             $validator = $exception->validator;
@@ -61,14 +62,18 @@ trait FormatsException
             }
         }
 
-        $replacements += [
-            ':message' => $message,
-            ':status_code' => $statusCode,
-            ':type' => class_basename($e->getClass()),
-        ];
+        if ($exception instanceof ExceptionWithErrors) {
+            if (! $exception->getErrors()->isEmpty()) {
+                $replacements[':errors'] = $exception->getErrors();
+            }
+        }
 
         if ($code = $e->getCode()) {
             $replacements[':code'] = $code;
+        }
+
+        if ($exception instanceof ExceptionWithErrors) {
+            $replacements[':type'] = $exception->getType();
         }
 
         if ($this->runningInDebugMode()) {
