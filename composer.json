@@ -36,9 +36,6 @@
         "test": "phpunit"
     },
     "extra": {
-        "branch-alias": {
-            "dev-master": "6.1-dev"
-        },
         "laravel": {
             "providers": [
                 "Jenky\\LaravelAPI\\ApiServiceProvider"
