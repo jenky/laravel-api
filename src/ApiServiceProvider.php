@@ -31,7 +31,15 @@ class ApiServiceProvider extends ServiceProvider
         $this->app->singleton(Parser::class, function ($app) {
             return new AcceptParser($this->config('standardsTree'), $this->config('subtype'), $this->config('version'), 'json');
         });
-
+    }
+    
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
         $this->registerRequestMacros();
         $this->registerResponseMacros();
         $this->registerRouterMacros();
