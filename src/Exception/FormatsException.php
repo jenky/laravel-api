@@ -72,7 +72,7 @@ trait FormatsException
             $replacements[':code'] = $code;
         }
 
-        if ($exception instanceof ExceptionWithErrors) {
+        if ($exception instanceof ExceptionWithType) {
             $replacements[':type'] = $exception->getType();
         }
 

@@ -32,7 +32,7 @@ class ApiServiceProvider extends ServiceProvider
             return new AcceptParser($this->config('standardsTree'), $this->config('subtype'), $this->config('version'), 'json');
         });
     }
-    
+
     /**
      * Bootstrap any application services.
      *
