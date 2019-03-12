@@ -29,7 +29,7 @@ class ApiServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(Parser::class, function ($app) {
-            return new AcceptParser($this->config('standardsTree'), $this->config('subtype'), $this->config('version'), 'json');
+            return new AcceptParser($this->config('standards_tree'), $this->config('subtype'), $this->config('version'), 'json');
         });
     }
 
@@ -105,7 +105,13 @@ class ApiServiceProvider extends ServiceProvider
         $validator = $this->app->make(Validator::class);
 
         $this->app['request']->macro('isApi', function () use ($validator) {
-            return $validator->validate($this);
+            static $isApi;
+
+            if (isset($isApi)) {
+                return $isApi;
+            }
+
+            return $isApi = $validator->validate($this);
         });
     }
 

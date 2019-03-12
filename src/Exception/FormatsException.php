@@ -77,17 +77,24 @@ trait FormatsException
         }
 
         if ($this->runningInDebugMode()) {
+            $trace = config('api.trace.as_string', false)
+                ? explode("\n", $exception->getTraceAsString())
+                : (config('api.trace.include_args', false)
+                    ? $e->getTrace()
+                    : collect($e->getTrace())->map(function ($item) {
+                        return Arr::except($item, ['args']);
+                    })->all()
+                );
+
+            if ($size = config('api.trace.size_limit', 0)) {
+                $trace = array_splice($trace, 0, $size);
+            }
+
             $replacements[':debug'] = [
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
                 'class' => $e->getClass(),
-                'trace' => config('api.trace.as_string', false)
-                    ? explode("\n", $exception->getTraceAsString())
-                    : config('api.trace.include_args', false)
-                        ? $e->getTrace()
-                        : collect($e->getTrace())->map(function ($trace) {
-                            return Arr::except($trace, ['args']);
-                        })->all(),
+                'trace' => $trace
             ];
         }
 
@@ -136,7 +143,7 @@ trait FormatsException
      */
     protected function getErrorFormat()
     {
-        return config('api.errorFormat', [
+        return config('api.error_format', [
             'message' => ':message',
             'type' => ':type',
             'status_code' => ':status_code',
