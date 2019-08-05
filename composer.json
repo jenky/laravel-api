@@ -15,9 +15,9 @@
         }
     ],
     "require": {
-        "illuminate/contracts": "^5.5",
-        "illuminate/config": "^5.5",
-        "illuminate/support": "^5.5"
+        "illuminate/contracts": "^5.5|^6.0",
+        "illuminate/config": "^5.5|^6.0",
+        "illuminate/support": "^5.5|^6.0"
     },
     "require-dev": {
         "phpunit/phpunit" : "5.*"
@@ -36,6 +36,9 @@
         "test": "phpunit"
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "6.4-dev"
+        },
         "laravel": {
             "providers": [
                 "Jenky\\LaravelAPI\\ApiServiceProvider"

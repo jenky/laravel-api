@@ -2,7 +2,7 @@
 
 namespace Jenky\LaravelAPI\Exception;
 
-interface TypeException
+interface ExceptionWithType
 {
     /**
      * Get exception type.

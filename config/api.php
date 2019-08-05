@@ -38,7 +38,7 @@ return [
     |
     */
 
-    'prefix' => env('API_PREFIX', null),
+    'prefix' => env('API_PREFIX', 'api'),
 
     /*
     |--------------------------------------------------------------------------
@@ -68,7 +68,7 @@ return [
     |
     */
 
-    'standardsTree' => env('API_STANDARDS_TREE', 'x'),
+    'standards_tree' => env('API_STANDARDS_TREE', 'x'),
 
     /*
     |--------------------------------------------------------------------------
@@ -122,7 +122,7 @@ return [
     |
     */
 
-    'errorFormat' => [
+    'error_format' => [
         'message' => ':message',
         'type' => ':type',
         'status_code' => ':status_code',
@@ -134,5 +134,6 @@ return [
     'trace' => [
         'as_string' => false,
         'include_args' => false,
+        'size_limit' => 20,
     ],
 ];
