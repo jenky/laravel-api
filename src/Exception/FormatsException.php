@@ -94,7 +94,7 @@ trait FormatsException
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
                 'class' => $e->getClass(),
-                'trace' => $trace
+                'trace' => $trace,
             ];
         }
 
