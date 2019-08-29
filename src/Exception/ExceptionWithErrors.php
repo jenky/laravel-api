@@ -15,7 +15,6 @@ interface ExceptionWithErrors
     /**
      * Get the error messages.
      *
-     * @param  array $errors
      * @return mixed
      */
     public function getErrors();

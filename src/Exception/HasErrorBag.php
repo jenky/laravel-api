@@ -12,6 +12,11 @@ trait HasErrorBag
     protected $errorBag = [];
 
     /**
+     * @var \Illuminate\Support\MessageBag
+     */
+    protected $messageBag;
+
+    /**
      * Set the error messages.
      *
      * @param  array $errors
@@ -27,11 +32,14 @@ trait HasErrorBag
     /**
      * Get the error messages.
      *
-     * @param  array $errors
-     * @return mixed
+     * @return \Illuminate\Contracts\Support\MessageBag
      */
     public function getErrors()
     {
-        return new MessageBag($this->errorBag);
+        if (is_null($this->messageBag)) {
+            $this->messageBag = new MessageBag($this->errorBag);
+        }
+
+        return $this->messageBag;
     }
 }
