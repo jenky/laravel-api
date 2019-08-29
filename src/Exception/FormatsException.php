@@ -73,7 +73,9 @@ trait FormatsException
         }
 
         if ($exception instanceof ExceptionWithType) {
-            $replacements[':type'] = $exception->getType();
+            if ($type = $exception->getType()) {
+                $replacements[':type'] = $type;
+            }
         }
 
         if ($this->runningInDebugMode()) {
