@@ -1,12 +1,11 @@
 <?php
 
-namespace Jenky\LaravelAPI\Http;
+namespace Jenky\LaravelAPI\Http\VersionParser;
 
 use Illuminate\Http\Request;
-use Jenky\LaravelAPI\Contracts\Http\Parser;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class AcceptParser implements Parser
+class AcceptParser
 {
     /**
      * Standards tree.

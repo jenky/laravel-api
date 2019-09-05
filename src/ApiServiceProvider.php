@@ -4,13 +4,14 @@ namespace Jenky\LaravelAPI;
 
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
-use Jenky\LaravelAPI\Contracts\Http\Parser;
+use Illuminate\Support\Str;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
-use Jenky\LaravelAPI\Http\AcceptParser;
+use Jenky\LaravelAPI\Contracts\Http\VersionParser;
 use Jenky\LaravelAPI\Http\ResponseMixins;
 use Jenky\LaravelAPI\Http\Routing\Router;
 use Jenky\LaravelAPI\Http\Validator\Domain;
 use Jenky\LaravelAPI\Http\Validator\Prefix;
+use Jenky\LaravelAPI\Http\VersionParser\Header;
 use RuntimeException;
 
 class ApiServiceProvider extends ServiceProvider
@@ -28,9 +29,13 @@ class ApiServiceProvider extends ServiceProvider
             return $this->createRequestValidator();
         });
 
-        $this->app->singleton(Parser::class, function ($app) {
-            return new AcceptParser($this->config('standards_tree'), $this->config('subtype'), $this->config('version'), 'json');
+        $this->app->singleton(VersionParser::class, function () {
+            return $this->createVersionParser();
         });
+
+        // $this->app->singleton(Parser::class, function ($app) {
+        //     return new AcceptParser($this->config('standards_tree'), $this->config('subtype'), $this->config('version'), 'json');
+        // });
     }
 
     /**
@@ -90,9 +95,31 @@ class ApiServiceProvider extends ServiceProvider
                 break;
 
             default:
-                throw new RuntimeException('Missing API scheme configuaration.');
+                throw new RuntimeException('Invalid API scheme configuration.');
                 break;
         }
+    }
+
+    /**
+     * Create a version parser.
+     *
+     * @throws \RuntimeException
+     * @return \Jenky\LaravelAPI\Contracts\Http\VersionParser
+     */
+    protected function createVersionParser()
+    {
+        $method = 'create'.Str::studly($this->config('version_scheme')).'VersionParser';
+
+        if (method_exists($this, $method)) {
+            $this->$method();
+        }
+
+        // throw new RuntimeException('Invalid API version scheme configuration.');
+    }
+
+    protected function createHeaderVersionParser()
+    {
+        return new Header;
     }
 
     /**
