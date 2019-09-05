@@ -111,7 +111,7 @@ class ApiServiceProvider extends ServiceProvider
         $method = 'create'.Str::studly($this->config('version_scheme')).'VersionParser';
 
         if (method_exists($this, $method)) {
-            $this->$method();
+            $this->{$method}();
         }
 
         // throw new RuntimeException('Invalid API version scheme configuration.');
