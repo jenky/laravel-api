@@ -37,7 +37,7 @@ class Domain implements Validator
      * @param  \Illuminate\Http\Request $request
      * @return bool
      */
-    public function validate(Request $request)
+    public function validate(Request $request): bool
     {
         return ! is_null($this->domain) && $request->getHost() === $this->getStrippedDomain();
     }

@@ -23,7 +23,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->setupConfig();
+        $this->mergeConfigFrom(__DIR__.'/../config/api.php', 'api');
 
         $this->app->singleton(Validator::class, function () {
             return $this->createRequestValidator();
@@ -45,23 +45,23 @@ class ApiServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->registerPublishing();
         $this->registerRequestMacros();
         $this->registerResponseMacros();
         $this->registerRouterMacros();
     }
 
     /**
-     * Setup the config.
+     * Register the package's publishable resources.
      *
      * @return void
      */
-    protected function setupConfig()
+    protected function registerPublishing()
     {
-        $configPath = __DIR__.'/../config/api.php';
-        $this->mergeConfigFrom($configPath, 'api');
-
         if ($this->app->runningInConsole()) {
-            $this->publishes([$configPath => config_path('api.php')], 'config');
+            $this->publishes([
+                __DIR__.'/../config/api.php' => config_path('api.php')
+            ], 'config');
         }
     }
 

@@ -13,5 +13,5 @@ interface Validator
      *
      * @return bool
      */
-    public function validate(Request $request);
+    public function validate(Request $request): bool;
 }

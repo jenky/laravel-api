@@ -32,7 +32,7 @@ class Prefix implements Validator
      * @param  \Illuminate\Http\Request $request
      * @return bool
      */
-    public function validate(Request $request)
+    public function validate(Request $request): bool
     {
         $prefix = $this->filterAndExplode($this->prefix);
 

@@ -11,7 +11,7 @@
     "authors": [
         {
             "name": "Linh Tran",
-            "email": "jenky.w0w@gmail.com"
+            "email": "contact@lynh.me"
         }
     ],
     "require": {
@@ -37,7 +37,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "6.4-dev"
+            "dev-master": "7.0-dev"
         },
         "laravel": {
             "providers": [
