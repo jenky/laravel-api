@@ -2,6 +2,7 @@
 
 namespace Jenky\LaravelAPI\Http\VersionParser;
 
+use Illuminate\Http\Request;
 use Jenky\LaravelAPI\Contracts\Http\VersionParser;
 
 class Uri implements VersionParser
@@ -13,6 +14,6 @@ class Uri implements VersionParser
      */
     public function version(Request $request): string
     {
-        //
+        return VersionParser::DEFAULT;
     }
 }

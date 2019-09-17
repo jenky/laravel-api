@@ -12,6 +12,7 @@ use Jenky\LaravelAPI\Http\Routing\Router;
 use Jenky\LaravelAPI\Http\Validator\Domain;
 use Jenky\LaravelAPI\Http\Validator\Prefix;
 use Jenky\LaravelAPI\Http\VersionParser\Header;
+use Jenky\LaravelAPI\Http\VersionParser\Uri;
 use RuntimeException;
 
 class ApiServiceProvider extends ServiceProvider
@@ -29,9 +30,7 @@ class ApiServiceProvider extends ServiceProvider
             return $this->createRequestValidator();
         });
 
-        $this->app->singleton(VersionParser::class, function () {
-            return $this->createVersionParser();
-        });
+        $this->registerVersionParser();
 
         // $this->app->singleton(Parser::class, function ($app) {
         //     return new AcceptParser($this->config('standards_tree'), $this->config('subtype'), $this->config('version'), 'json');
@@ -101,25 +100,42 @@ class ApiServiceProvider extends ServiceProvider
     }
 
     /**
-     * Create a version parser.
+     * Register the package version parser.
      *
      * @throws \RuntimeException
-     * @return \Jenky\LaravelAPI\Contracts\Http\VersionParser
+     * @return void
      */
-    protected function createVersionParser()
+    protected function registerVersionParser()
     {
-        $method = 'create'.Str::studly($this->config('version_scheme')).'VersionParser';
+        $method = 'register'.Str::studly($this->config('version_scheme')).'VersionParser';
 
         if (method_exists($this, $method)) {
             $this->{$method}();
         }
-
-        // throw new RuntimeException('Invalid API version scheme configuration.');
     }
 
-    protected function createHeaderVersionParser()
+    /**
+     * Register the package header version parser.
+     *
+     * @return void
+     */
+    protected function registerHeaderVersionParser()
     {
-        return new Header;
+        $this->app->singleton(VersionParser::class, function () {
+            return new Header($this->app['config']);
+        });
+    }
+
+    /**
+     * Register the package URI version parser.
+     *
+     * @return void
+     */
+    protected function registerUriVersionParser()
+    {
+        $this->app->singleton(VersionParser::class, function () {
+            return new Uri;
+        });
     }
 
     /**

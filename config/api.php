@@ -22,11 +22,11 @@ return [
     |
     | A default versioning scheme to use for your API.
     |
-    | Supported: "prefix", "header"
+    | Supported: "uri", "header"
     |
     */
 
-    'version_scheme' => env('API_VERSION_SCHEME', 'prefix'),
+    'version_scheme' => env('API_VERSION_SCHEME', 'uri'),
 
     /*
     |--------------------------------------------------------------------------

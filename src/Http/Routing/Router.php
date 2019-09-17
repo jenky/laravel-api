@@ -7,7 +7,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RouteRegistrar;
-use Jenky\LaravelAPI\Contracts\Http\Parser;
+use Jenky\LaravelAPI\Contracts\Http\VersionParser;
 
 class Router
 {
@@ -27,7 +27,7 @@ class Router
     protected $config;
 
     /**
-     * @var \Jenky\LaravelAPI\Contracts\Http\Parser
+     * @var \Jenky\LaravelAPI\Contracts\Http\VersionParser
      */
     protected $parser;
 
@@ -37,10 +37,10 @@ class Router
      * @param  \Illuminate\Http\Request $request
      * @param  \Illuminate\Contracts\Routing\Registrar $router
      * @param  \Illuminate\Config\Repository $config
-     * @param  \Jenky\LaravelAPI\Contracts\Http\Parser $parser
+     * @param  \Jenky\LaravelAPI\Contracts\Http\VersionParser $parser
      * @return void
      */
-    public function __construct(Request $request, Registrar $router, Config $config, Parser $parser)
+    public function __construct(Request $request, Registrar $router, Config $config, VersionParser $parser)
     {
         $this->request = $request;
         $this->router = $router;
