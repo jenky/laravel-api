@@ -5,6 +5,7 @@ namespace Jenky\LaravelAPI\Exception;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,7 @@ trait FormatsException
         $response = $this->getErrorFormat();
 
         array_walk_recursive($response, function (&$value, $key) use ($exception, $replacements) {
-            if (starts_with($value, ':') && isset($replacements[$value])) {
+            if (Str::startsWith($value, ':') && isset($replacements[$value])) {
                 $value = $replacements[$value];
             }
         });
@@ -121,7 +122,7 @@ trait FormatsException
 
         return array_filter($input, function ($value) {
             if (is_string($value)) {
-                return ! starts_with($value, ':');
+                return ! Str::startsWith($value, ':');
             }
 
             return true;
