@@ -7,8 +7,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Contracts\Http\VersionParser;
+use Jenky\LaravelAPI\Http\Middleware\ApiVersionMiddleware;
 use Jenky\LaravelAPI\Http\ResponseMixins;
-use Jenky\LaravelAPI\Http\Routing\Router;
 use Jenky\LaravelAPI\Http\Validator\Domain;
 use Jenky\LaravelAPI\Http\Validator\Prefix;
 use Jenky\LaravelAPI\Http\VersionParser\Header;
@@ -175,10 +175,10 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerRouterMacros()
     {
-        $router = $this->app->make(Router::class);
-
-        $this->app['router']->macro('api', function ($version, ...$args) use ($router) {
-            return $router->register($version, ...$args);
+        $this->app['router']->macro('api', function (...$versions) {
+            return $this->middleware(
+                ApiVersionMiddleware::class.':'.implode(',', $versions)
+            );
         });
     }
 }
