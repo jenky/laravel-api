@@ -7,7 +7,6 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Contracts\Http\VersionParser;
-use Jenky\LaravelAPI\Http\Middleware\ApiVersionMiddleware;
 use Jenky\LaravelAPI\Http\Validator\DomainValidator;
 use Jenky\LaravelAPI\Http\Validator\PrefixValidator;
 use Jenky\LaravelAPI\Http\VersionParser\Header;
