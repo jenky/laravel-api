@@ -16,7 +16,8 @@ class ApiVersionMiddleware
      */
     public function handle($request, Closure $next, ...$versions)
     {
-        dd($versions);
+        $request->route()->action['versions'] = $versions;
+
         return $next($request);
     }
 }

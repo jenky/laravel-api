@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 
-class Domain implements Validator
+class DomainValidator implements Validator
 {
     /**
      * @var string

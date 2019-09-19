@@ -5,7 +5,7 @@ namespace Jenky\LaravelAPI\Http\Validator;
 use Illuminate\Http\Request;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 
-class Prefix implements Validator
+class PrefixValidator implements Validator
 {
     /**
      * API prefix.

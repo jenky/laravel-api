@@ -8,11 +8,13 @@ use Illuminate\Support\Str;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Contracts\Http\VersionParser;
 use Jenky\LaravelAPI\Http\Middleware\ApiVersionMiddleware;
-use Jenky\LaravelAPI\Http\ResponseMixins;
-use Jenky\LaravelAPI\Http\Validator\Domain;
-use Jenky\LaravelAPI\Http\Validator\Prefix;
+use Jenky\LaravelAPI\Http\Validator\DomainValidator;
+use Jenky\LaravelAPI\Http\Validator\PrefixValidator;
 use Jenky\LaravelAPI\Http\VersionParser\Header;
 use Jenky\LaravelAPI\Http\VersionParser\Uri;
+use Jenky\LaravelAPI\Macros\RequestMacros;
+use Jenky\LaravelAPI\Macros\ResponseMacros;
+use Jenky\LaravelAPI\Macros\RouterMacros;
 use RuntimeException;
 
 class ApiServiceProvider extends ServiceProvider
@@ -86,11 +88,11 @@ class ApiServiceProvider extends ServiceProvider
     {
         switch ($this->config('uri_scheme')) {
             case 'prefix':
-                return new Prefix($this->config('prefix'));
+                return new PrefixValidator($this->config('prefix'));
                 break;
 
             case 'domain':
-                return new Domain($this->config('domain'));
+                return new DomainValidator($this->config('domain'));
                 break;
 
             default:
@@ -145,17 +147,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerRequestMacros()
     {
-        $validator = $this->app->make(Validator::class);
-
-        $this->app['request']->macro('isApi', function () use ($validator) {
-            static $isApi;
-
-            if (isset($isApi)) {
-                return $isApi;
-            }
-
-            return $isApi = $validator->validate($this);
-        });
+        $this->app['request']->mixin(new RequestMacros);
     }
 
     /**
@@ -165,7 +157,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerResponseMacros()
     {
-        Response::mixin(new ResponseMixins);
+        Response::mixin(new ResponseMacros);
     }
 
     /**
@@ -175,10 +167,6 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerRouterMacros()
     {
-        $this->app['router']->macro('api', function (...$versions) {
-            return $this->middleware(
-                ApiVersionMiddleware::class.':'.implode(',', $versions)
-            );
-        });
+        $this->app['router']->mixin(new RouterMacros);
     }
 }

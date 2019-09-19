@@ -1,8 +1,8 @@
 <?php
 
-namespace Jenky\LaravelAPI\Http;
+namespace Jenky\LaravelAPI\Macros;
 
-class ResponseMixins
+class ResponseMacros
 {
     /**
      * Respond with a created response and associate a location and/or content if provided.
