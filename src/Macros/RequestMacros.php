@@ -2,8 +2,8 @@
 
 namespace Jenky\LaravelAPI\Macros;
 
-use Composer\Semver\Semver;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
+use Jenky\LaravelAPI\Contracts\Http\VersionParser;
 
 class RequestMacros
 {
@@ -21,22 +21,29 @@ class RequestMacros
                 return $isApi;
             }
 
-            return $isApi = resolve(Validator::class)->validate($this);
+            return $isApi = resolve(Validator::class)->matches($this);
         };
     }
 
+    /**
+     * Get the API version of the request.
+     *
+     * @return string|null
+     */
     public function version()
     {
-        return function ($constraints = null) {
-            $route = $this->route();
-
-            if (! $route) {
+        return function ($strict = false) {
+            if ($strict && ! $this->isApi()) {
                 return;
             }
 
-            $version = $route->action['versions'] ?? [];
+            static $version;
 
-            return $constraints ? ! empty(Semver::satisfiedBy($version, $constraints)) : $version;
+            if (isset($version)) {
+                return $version;
+            }
+
+            return $version = resolve(VersionParser::class)->parse($this);
         };
     }
 }

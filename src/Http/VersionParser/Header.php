@@ -29,9 +29,9 @@ class Header implements VersionParser
     /**
      * Parse the request an get the API version.
      *
-     * @return string
+     * @return string|null
      */
-    public function version(Request $request): string
+    public function parse(Request $request): ?string
     {
         return VersionParser::DEFAULT;
     }

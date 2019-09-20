@@ -2,6 +2,7 @@
 
 namespace Jenky\LaravelAPI;
 
+use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -13,6 +14,7 @@ use Jenky\LaravelAPI\Http\VersionParser\Header;
 use Jenky\LaravelAPI\Http\VersionParser\Uri;
 use Jenky\LaravelAPI\Macros\RequestMacros;
 use Jenky\LaravelAPI\Macros\ResponseMacros;
+use Jenky\LaravelAPI\Macros\RouteMacros;
 use Jenky\LaravelAPI\Macros\RouterMacros;
 use RuntimeException;
 
@@ -160,12 +162,13 @@ class ApiServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register router macros.
+     * Register router and route macros.
      *
      * @return void
      */
     protected function registerRouterMacros()
     {
         $this->app['router']->mixin(new RouterMacros);
+        Route::mixin(new RouteMacros);
     }
 }

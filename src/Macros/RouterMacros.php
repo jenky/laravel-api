@@ -2,21 +2,19 @@
 
 namespace Jenky\LaravelAPI\Macros;
 
-use Jenky\LaravelAPI\Http\Middleware\ApiVersionMiddleware;
+use Jenky\LaravelAPI\Http\Routing\ApiRouteRegistrar;
 
 class RouterMacros
 {
     /**
-     * Add the API version middleware to the route.
+     * Assign version to route.
      *
-     * @return \Illuminate\Routing\RouteRegistrar
+     * @return \Jenky\LaravelAPI\Http\Routing\ApiRouteRegistrar
      */
     public function api()
     {
         return function (...$versions) {
-            return $this->middleware(
-                ApiVersionMiddleware::class.':'.implode(',', $versions)
-            );
+            return (new ApiRouteRegistrar($this))->attribute('versions', $versions);
         };
     }
 }
