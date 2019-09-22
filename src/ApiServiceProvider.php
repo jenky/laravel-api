@@ -29,10 +29,7 @@ class ApiServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/api.php', 'api');
 
-        $this->app->singleton(Validator::class, function () {
-            return $this->createRequestValidator();
-        });
-
+        $this->registerRequestValidator();
         $this->registerVersionParser();
 
         // $this->app->singleton(Parser::class, function ($app) {
@@ -80,26 +77,44 @@ class ApiServiceProvider extends ServiceProvider
     }
 
     /**
-     * Create a request validator.
+     * Register the package request validator.
      *
      * @throws \RuntimeException
-     * @return \Jenky\LaravelAPI\Contracts\Http\Validator
+     * @return void
      */
-    protected function createRequestValidator()
+    protected function registerRequestValidator()
     {
-        switch ($this->config('uri_scheme')) {
-            case 'prefix':
-                return new PrefixValidator($this->config('prefix'));
-                break;
+        $method = 'register'.Str::studly($this->config('uri_scheme')).'Validator';
 
-            case 'domain':
-                return new DomainValidator($this->config('domain'));
-                break;
-
-            default:
-                throw new RuntimeException('Invalid API scheme configuration.');
-                break;
+        if (method_exists($this, $method)) {
+            $this->{$method}();
         }
+
+        throw new RuntimeException('Invalid API scheme configuration.');
+    }
+
+    /**
+     * Register the package prefix validator.
+     *
+     * @return void
+     */
+    protected function registerPrefixValidator()
+    {
+        $this->app->singleton(Validator::class, function () {
+            return new PrefixValidator($this->config('prefix'));
+        });
+    }
+
+    /**
+     * Register the package domain validator.
+     *
+     * @return void
+     */
+    protected function registerDomainValidator()
+    {
+        $this->app->singleton(Validator::class, function () {
+            return new DomainValidator($this->config('prefix'));
+        });
     }
 
     /**
@@ -115,6 +130,8 @@ class ApiServiceProvider extends ServiceProvider
         if (method_exists($this, $method)) {
             $this->{$method}();
         }
+
+        throw new RuntimeException('Invalid version parser.');
     }
 
     /**
