@@ -88,9 +88,20 @@ class ApiServiceProvider extends ServiceProvider
 
         if (method_exists($this, $method)) {
             $this->{$method}();
+        } else {
+            throw new RuntimeException('Invalid API scheme configuration.');
         }
+    }
 
-        throw new RuntimeException('Invalid API scheme configuration.');
+    /**
+     * Bind the request validator implementation to the application container.
+     *
+     * @param  \Jenky\LaravelAPI\Contracts\Http\Validator $validator
+     * @return void
+     */
+    protected function bindRequestValidatorToContainer(Validator $validator)
+    {
+        $this->app->singleton(Validator::class, $validator);
     }
 
     /**
@@ -100,9 +111,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerPrefixValidator()
     {
-        $this->app->singleton(Validator::class, function () {
-            return new PrefixValidator($this->config('prefix'));
-        });
+        $this->bindRequestValidatorToContainer(new PrefixValidator($this->config('prefix')));
     }
 
     /**
@@ -112,9 +121,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerDomainValidator()
     {
-        $this->app->singleton(Validator::class, function () {
-            return new DomainValidator($this->config('prefix'));
-        });
+        $this->bindRequestValidatorToContainer(new DomainValidator($this->config('domain')));
     }
 
     /**
@@ -129,9 +136,20 @@ class ApiServiceProvider extends ServiceProvider
 
         if (method_exists($this, $method)) {
             $this->{$method}();
+        } else {
+            throw new RuntimeException('Invalid version parser.');
         }
+    }
 
-        throw new RuntimeException('Invalid version parser.');
+    /**
+     * Bind the version parser implementation to the application container.
+     *
+     * @param  \Jenky\LaravelAPI\Contracts\Http\VersionParser $parser
+     * @return void
+     */
+    protected function bindVersionParserToContainer(VersionParser $parser)
+    {
+        $this->app->singleton(VersionParser::class, $parser);
     }
 
     /**
@@ -141,9 +159,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerHeaderVersionParser()
     {
-        $this->app->singleton(VersionParser::class, function () {
-            return new Header($this->app['config']);
-        });
+        $this->bindVersionParserToContainer(new Header($this->app['config']));
     }
 
     /**
@@ -153,9 +169,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerUriVersionParser()
     {
-        $this->app->singleton(VersionParser::class, function () {
-            return new Uri;
-        });
+        $this->bindVersionParserToContainer(new Uri);
     }
 
     /**

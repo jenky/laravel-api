@@ -14,6 +14,12 @@ class Uri implements VersionParser
      */
     public function parse(Request $request): ?string
     {
-        return VersionParser::DEFAULT;
+        $route = $request->route();
+
+        if (! $route) {
+            return null;
+        }
+
+        return $route->version();
     }
 }
