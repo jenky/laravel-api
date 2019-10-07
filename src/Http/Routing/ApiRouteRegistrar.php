@@ -17,6 +17,6 @@ class ApiRouteRegistrar extends RouteRegistrar
     {
         parent::__construct($router);
 
-        $this->allowedAttributes[] = 'versions';
+        $this->allowedAttributes[] = 'version';
     }
 }

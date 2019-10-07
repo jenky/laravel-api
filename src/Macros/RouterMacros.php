@@ -13,8 +13,8 @@ class RouterMacros
      */
     public function api()
     {
-        return function (...$versions) {
-            return (new ApiRouteRegistrar($this))->attribute('versions', $versions);
+        return function ($version) {
+            return (new ApiRouteRegistrar($this))->attribute('version', $version);
         };
     }
 }

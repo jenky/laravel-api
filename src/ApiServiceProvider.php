@@ -29,12 +29,8 @@ class ApiServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/api.php', 'api');
 
-        $this->registerRequestValidator();
+        // $this->registerRequestValidator();
         $this->registerVersionParser();
-
-        // $this->app->singleton(Parser::class, function ($app) {
-        //     return new AcceptParser($this->config('standards_tree'), $this->config('subtype'), $this->config('version'), 'json');
-        // });
     }
 
     /**
@@ -101,7 +97,9 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function bindRequestValidatorToContainer(Validator $validator)
     {
-        $this->app->singleton(Validator::class, $validator);
+        $this->app->singleton(Validator::class, function () use ($validator) {
+            return $validator;
+        });
     }
 
     /**
@@ -149,7 +147,9 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function bindVersionParserToContainer(VersionParser $parser)
     {
-        $this->app->singleton(VersionParser::class, $parser);
+        $this->app->singleton(VersionParser::class, function () use ($parser) {
+            return $parser;
+        });
     }
 
     /**
@@ -159,7 +159,9 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerHeaderVersionParser()
     {
-        $this->bindVersionParserToContainer(new Header($this->app['config']));
+        $this->bindVersionParserToContainer(
+            new Header($this->app['config'])
+        );
     }
 
     /**

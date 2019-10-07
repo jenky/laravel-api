@@ -11,10 +11,8 @@ class RouteMacros
      */
     public function api()
     {
-        return function (...$versions) {
-            return $this->action['versions'] = array_unique(array_merge(
-                $versions, ($this->action['versions'] ?? [])
-            ));
+        return function ($version) {
+            return $this->action['version'] = $version;
         };
     }
 
@@ -26,7 +24,7 @@ class RouteMacros
     public function version()
     {
         return function () {
-            return $this->action['versions'] ?? null;
+            return $this->action['version'] ?? null;
         };
     }
 }

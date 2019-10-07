@@ -26,7 +26,7 @@ return [
     |
     */
 
-    'version_scheme' => env('API_VERSION_SCHEME', 'uri'),
+    'version_scheme' => env('API_VERSION_SCHEME', 'header'),
 
     /*
     |--------------------------------------------------------------------------

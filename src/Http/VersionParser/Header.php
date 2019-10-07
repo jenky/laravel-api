@@ -29,10 +29,27 @@ class Header implements VersionParser
     /**
      * Parse the request an get the API version.
      *
+     * @param  \Illuminate\Http\Request $request
      * @return string|null
      */
     public function parse(Request $request): ?string
     {
-        return VersionParser::DEFAULT;
+        $parsed = $this->getAcceptParser($request)
+            ->parse($request, $this->config->get('api.strict'));
+
+        return $parsed['version'] ?? null;
+    }
+
+    protected function getAcceptParser(Request $request): AcceptParser
+    {
+        $route = $request->route();
+        $version = $route ? $route->version() : $this->config->get('api.version');
+
+        return new AcceptParser(
+            $this->config->get('api.standards_tree'),
+            $this->config->get('api.subtype'),
+            $version,
+            $this->config->get('api.format', 'json')
+        );
     }
 }

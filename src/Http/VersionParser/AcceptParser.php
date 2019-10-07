@@ -75,6 +75,8 @@ class AcceptParser
             preg_match($pattern, $default, $matches);
         }
 
-        return array_combine(['subtype', 'version', 'format'], array_slice($matches, 1));
+        return array_combine(
+            ['subtype', 'version', 'format'], array_slice($matches, 1)
+        );
     }
 }

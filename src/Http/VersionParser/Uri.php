@@ -10,6 +10,7 @@ class Uri implements VersionParser
     /**
      * Parse the request an get the API version.
      *
+     * @param  \Illuminate\Http\Request $request
      * @return string|null
      */
     public function parse(Request $request): ?string
