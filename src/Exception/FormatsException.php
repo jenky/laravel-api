@@ -33,7 +33,12 @@ trait FormatsException
 
         $response = $this->removeEmptyReplacements($response);
 
-        return new JsonResponse($response, $exception->getStatusCode(), $exception->getHeaders(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        return new JsonResponse(
+            $response,
+            $exception->getStatusCode(),
+            $exception->getHeaders(),
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        );
     }
 
     /**
