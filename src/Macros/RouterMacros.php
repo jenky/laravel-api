@@ -2,6 +2,7 @@
 
 namespace Jenky\LaravelAPI\Macros;
 
+use Jenky\LaravelAPI\Http\Routing\ApiRoutePendingRegistration;
 use Jenky\LaravelAPI\Http\Routing\ApiRouteRegistrar;
 
 class RouterMacros
@@ -14,7 +15,13 @@ class RouterMacros
     public function api()
     {
         return function ($version) {
-            return (new ApiRouteRegistrar($this))->attribute('version', $version);
+            return new ApiRoutePendingRegistration(
+                $this->container && $this->container->bound(ApiRouteRegistrar::class)
+                    ? $this->container->make(ApiRouteRegistrar::class)
+                    : new ApiRouteRegistrar($this),
+                $version,
+                $this->container
+            );
         };
     }
 }

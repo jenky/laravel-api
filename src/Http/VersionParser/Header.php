@@ -40,6 +40,12 @@ class Header implements VersionParser
         return $parsed['version'] ?? null;
     }
 
+    /**
+     * Get the Accept header parser.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Jenky\LaravelAPI\Http\VersionParser\AcceptParser
+     */
     protected function getAcceptParser(Request $request): AcceptParser
     {
         $route = $request->route();

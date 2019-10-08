@@ -29,7 +29,7 @@ class ApiServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/api.php', 'api');
 
-        // $this->registerRequestValidator();
+        $this->registerRequestValidator();
         $this->registerVersionParser();
     }
 
@@ -55,7 +55,7 @@ class ApiServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../config/api.php' => config_path('api.php')
+                __DIR__.'/../config/api.php' => config_path('api.php'),
             ], 'config');
         }
     }
@@ -109,7 +109,9 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerPrefixValidator()
     {
-        $this->bindRequestValidatorToContainer(new PrefixValidator($this->config('prefix')));
+        $this->bindRequestValidatorToContainer(
+            new PrefixValidator($this->config('prefix'))
+        );
     }
 
     /**
@@ -119,7 +121,9 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerDomainValidator()
     {
-        $this->bindRequestValidatorToContainer(new DomainValidator($this->config('domain')));
+        $this->bindRequestValidatorToContainer(
+            new DomainValidator($this->config('domain'))
+        );
     }
 
     /**

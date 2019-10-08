@@ -26,15 +26,14 @@ return [
     |
     */
 
-    'version_scheme' => env('API_VERSION_SCHEME', 'header'),
+    'version_scheme' => env('API_VERSION_SCHEME', 'uri'),
 
     /*
     |--------------------------------------------------------------------------
     | Default API Prefix
     |--------------------------------------------------------------------------
     |
-    | A default prefix to use for your API routes so you don't have to
-    | specify it for each group.
+    | A default prefix to use for your API routes.
     |
     */
 
@@ -45,8 +44,7 @@ return [
     | Default API Domain
     |--------------------------------------------------------------------------
     |
-    | A default domain to use for your API routes so you don't have to
-    | specify it for each group.
+    | A default domain to use for your API routes.
     |
     */
 
