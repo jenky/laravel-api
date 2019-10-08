@@ -33,20 +33,6 @@ class ResponseMacros
     }
 
     /**
-     * Respond with a no content response.
-     *
-     * @return $this
-     */
-    public function noContent()
-    {
-        return function () {
-            $this->setStatusCode(204);
-
-            return $this;
-        };
-    }
-
-    /**
      * Make a response and associate a location and/or content if provided.
      *
      * @param  int $status
