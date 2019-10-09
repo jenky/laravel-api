@@ -2,33 +2,72 @@
 
 namespace Jenky\LaravelAPI\Test;
 
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Jenky\LaravelAPI\ApiServiceProvider;
+use Jenky\LaravelAPI\Test\Fixtures\ExceptionHandler as Handler;
 use Orchestra\Testbench\TestCase;
 
 class FeatureTestCase extends TestCase
 {
     /**
-     * Setup the test environment.
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        require 'routes.php';
-    }
-
-    /**
-     * Get base path.
+     * Get package providers.
      *
-     * @return string
+     * @param  \Illuminate\Foundation\Application  $app
+     *
+     * @return array
      */
-    // protected function getBasePath()
-    // {
-    //     return __DIR__.'/../../';
-    // }
-
     protected function getPackageProviders($app)
     {
         return [
             ApiServiceProvider::class,
+        ];
+    }
+
+    /**
+     * Resolve application HTTP exception handler.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     *
+     * @return void
+     */
+    protected function resolveApplicationExceptionHandler($app)
+    {
+        $app->singleton(ExceptionHandler::class, Handler::class);
+    }
+
+    /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application   $app
+     *
+     * @return void
+     */
+    protected function getEnvironmentSetUp($app)
+    {
+        $config = $app->get('config');
+
+        $config->set('database.default', 'testbench');
+
+        $config->set('database.connections.testbench', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+    }
+
+    /**
+     * Get the test response for testing.
+     *
+     * @param  string|null $version
+     * @return array
+     */
+    protected function getResponseBody($version = null)
+    {
+        return [
+            'version' => [
+                'set' => $version,
+                'route' => request()->route()->version(),
+            ],
         ];
     }
 }

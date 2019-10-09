@@ -139,7 +139,7 @@ class ApiServiceProvider extends ServiceProvider
         if (method_exists($this, $method)) {
             $this->{$method}();
         } else {
-            throw new RuntimeException('Invalid version parser.');
+            throw new RuntimeException('Invalid version scheme configuration.');
         }
     }
 

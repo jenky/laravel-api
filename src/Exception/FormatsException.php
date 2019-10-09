@@ -58,6 +58,7 @@ trait FormatsException
             ':message' => $e->getMessage() ?: Arr::get(Response::$statusTexts, $statusCode),
             ':status_code' => $statusCode,
             ':type' => class_basename($e->getClass()),
+            ':code' => $e->getCode(),
         ];
 
         if ($exception instanceof ValidationException) {
@@ -72,10 +73,6 @@ trait FormatsException
             if (! $exception->getErrors()->isEmpty()) {
                 $replacements[':errors'] = $exception->getErrors();
             }
-        }
-
-        if ($code = $e->getCode()) {
-            $replacements[':code'] = $code;
         }
 
         if ($exception instanceof ExceptionWithType) {
