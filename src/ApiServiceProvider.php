@@ -10,8 +10,10 @@ use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Contracts\Http\VersionParser;
 use Jenky\LaravelAPI\Http\Validator\DomainValidator;
 use Jenky\LaravelAPI\Http\Validator\PrefixValidator;
+use Jenky\LaravelAPI\Http\Validator\ValidatorManager;
 use Jenky\LaravelAPI\Http\VersionParser\Header;
 use Jenky\LaravelAPI\Http\VersionParser\Uri;
+use Jenky\LaravelAPI\Http\VersionParser\VersionParserManager;
 use Jenky\LaravelAPI\Macros\RequestMacros;
 use Jenky\LaravelAPI\Macros\ResponseMacros;
 use Jenky\LaravelAPI\Macros\RouteMacros;
@@ -80,13 +82,17 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerRequestValidator()
     {
-        $method = 'register'.Str::studly($this->config('uri_scheme')).'Validator';
+        // TODO: clean up
+        // $method = 'register'.Str::studly($this->config('uri_scheme')).'Validator';
 
-        if (method_exists($this, $method)) {
-            $this->{$method}();
-        } else {
-            throw new RuntimeException('Invalid API scheme configuration.');
-        }
+        // if (method_exists($this, $method)) {
+        //     $this->{$method}();
+        // } else {
+        //     throw new RuntimeException('Invalid API scheme configuration.');
+        // }
+        $this->app->singleton(Validator::class, function ($app) {
+            return new ValidatorManager($app);
+        });
     }
 
     /**
@@ -97,6 +103,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function bindRequestValidatorToContainer(Validator $validator)
     {
+        // TODO: removed
         $this->app->singleton(Validator::class, function () use ($validator) {
             return $validator;
         });
@@ -109,6 +116,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerPrefixValidator()
     {
+        // TODO: removed
         $this->bindRequestValidatorToContainer(
             new PrefixValidator($this->config('prefix'))
         );
@@ -121,6 +129,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerDomainValidator()
     {
+        // TODO: removed
         $this->bindRequestValidatorToContainer(
             new DomainValidator($this->config('domain'))
         );
@@ -134,13 +143,17 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerVersionParser()
     {
-        $method = 'register'.Str::studly($this->config('version_scheme')).'VersionParser';
+        // TODO: clean up
+        // $method = 'register'.Str::studly($this->config('version_scheme')).'VersionParser';
 
-        if (method_exists($this, $method)) {
-            $this->{$method}();
-        } else {
-            throw new RuntimeException('Invalid version scheme configuration.');
-        }
+        // if (method_exists($this, $method)) {
+        //     $this->{$method}();
+        // } else {
+        //     throw new RuntimeException('Invalid version scheme configuration.');
+        // }
+        $this->app->singleton(VersionParser::class, function ($app) {
+            return new VersionParserManager($app);
+        });
     }
 
     /**
@@ -151,6 +164,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function bindVersionParserToContainer(VersionParser $parser)
     {
+        // TODO: removed
         $this->app->singleton(VersionParser::class, function () use ($parser) {
             return $parser;
         });
@@ -163,6 +177,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerHeaderVersionParser()
     {
+        // TODO: removed
         $this->bindVersionParserToContainer(
             new Header($this->app['config'])
         );
@@ -175,6 +190,8 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerUriVersionParser()
     {
+        // TODO: removed
+
         $this->bindVersionParserToContainer(new Uri);
     }
 

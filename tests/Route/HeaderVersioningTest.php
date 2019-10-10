@@ -3,8 +3,6 @@
 namespace Jenky\LaravelAPI\Test\Route;
 
 use Illuminate\Support\Facades\Route;
-use Jenky\LaravelAPI\Contracts\Http\VersionParser;
-use Jenky\LaravelAPI\Http\VersionParser\Header;
 use Jenky\LaravelAPI\Test\FeatureTestCase;
 
 class HeaderVersioningTest extends FeatureTestCase
@@ -13,11 +11,9 @@ class HeaderVersioningTest extends FeatureTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        // $app->get('config')->set('api.version_scheme', 'header');
-        $app->rebinding(VersionParser::class, function ($app) {
-            return new Header($app['config']);
-        });
-        dd($app->getBindings());
+        $app->get('config')->set('api.version_scheme', 'header');
+
+        $this->loadRoutes();
     }
 
     protected function loadRoutes()
@@ -36,52 +32,50 @@ class HeaderVersioningTest extends FeatureTestCase
             });
     }
 
-    public function test_version_parser_is_header()
+    public function test_api_default_version_header()
     {
-        $this->assertInstanceOf(Header::class, $this->app[VersionParser::class]);
+        $config = $this->app->get('config');
+
+        $this->getJson('/api')
+            ->assertOk()
+            ->assertJson([
+                'version' => [
+                    'set' => $config->get('api.version'),
+                    'route' => $config->get('api.version'),
+                ],
+            ]);
     }
 
-    // public function test_api_default_version_header()
-    // {
-    //     $config = $this->app->get('config');
+    /**
+     * Todo: Fix all below test cases since request headers are dropped.
+     */
+    public function test_api_invalid_version_header()
+    {
+        $this->getJson('/api', ['Accept' => 'application/x.laravel.v3+json'])
+            ->assertNotFound();
+    }
 
-    //     $this->loadRoutes();
+    public function test_api_v1_header()
+    {
+        $this->getJson('/api', ['Accept' => 'application/x.laravel.v1+json'])
+            ->assertOk()
+            ->assertJson([
+                'version' => [
+                    'set' => 'v1',
+                    'route' => 'v1',
+                ],
+            ]);
+    }
 
-    //     $this->getJson('/api')
-    //         ->assertOk()
-    //         ->assertJson([
-    //             'version' => [
-    //                 'set' => $config->get('api.version'),
-    //                 'route' => $config->get('api.version'),
-    //             ],
-    //         ]);
-    // }
-
-    // public function test_api_v1_header()
-    // {
-    //     $this->loadRoutes();
-
-    //     $this->getJson('/api', ['Accept' => 'x.laravel.v1+json'])
-    //         ->assertOk()
-    //         ->assertJson([
-    //             'version' => [
-    //                 'set' => 'v1',
-    //                 'route' => 'v1',
-    //             ],
-    //         ]);
-    // }
-
-    // public function test_api_v2_header()
-    // {
-    //     $this->loadRoutes();
-
-    //     $this->getJson('/api', ['Accept' => 'x.laravel.v2+json'])
-    //         ->assertOk()
-    //         ->assertJson([
-    //             'version' => [
-    //                 'set' => 'v2',
-    //                 'route' => 'v2',
-    //             ],
-    //         ]);
-    // }
+    public function test_api_v2_header()
+    {
+        $this->getJson('/api', ['Accept' => 'application/x.laravel.v2+json'])
+            ->assertOk()
+            ->assertJson([
+                'version' => [
+                    'set' => 'v2',
+                    'route' => 'v2',
+                ],
+            ]);
+    }
 }

@@ -3,12 +3,19 @@
 namespace Jenky\LaravelAPI\Test\Route;
 
 use Illuminate\Support\Facades\Route;
-use Jenky\LaravelAPI\Contracts\Http\VersionParser;
-use Jenky\LaravelAPI\Http\VersionParser\Uri;
 use Jenky\LaravelAPI\Test\FeatureTestCase;
 
 class PrefixVersioningTest extends FeatureTestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app->get('config')->set('api.version_scheme', 'uri');
+
+        $this->loadRoutes();
+    }
+
     protected function loadRoutes()
     {
         Route::api('v1')
@@ -28,15 +35,8 @@ class PrefixVersioningTest extends FeatureTestCase
             });
     }
 
-    public function test_version_parser_is_uri()
-    {
-        $this->assertInstanceOf(Uri::class, $this->app[VersionParser::class]);
-    }
-
     public function test_api_v1_prefix()
     {
-        $this->loadRoutes();
-
         $this->getJson('/api/v1')
             ->assertOk()
             ->assertJson([
@@ -49,8 +49,6 @@ class PrefixVersioningTest extends FeatureTestCase
 
     public function test_api_v2_prefix()
     {
-        $this->loadRoutes();
-
         $this->getJson('/api/v2')
             ->assertOk()
             ->assertJson([

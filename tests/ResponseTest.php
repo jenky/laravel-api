@@ -4,7 +4,6 @@ namespace Jenky\LaravelAPI\Test;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
-use Jenky\LaravelAPI\Test\FeatureTestCase;
 
 class ResponseTest extends FeatureTestCase
 {
@@ -37,7 +36,7 @@ class ResponseTest extends FeatureTestCase
     {
         Route::get('api/errors', function () {
             request()->validate([
-                'q' => 'required'
+                'q' => 'required',
             ]);
 
             return ['ok' => true];
