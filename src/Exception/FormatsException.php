@@ -2,25 +2,25 @@
 
 namespace Jenky\LaravelAPI\Exception;
 
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 trait FormatsException
 {
     /**
      * Map exception into an JSON response.
      *
-     * @param  \Exception $e
+     * @param  \Throwable $e
      * @param  null|int $statusCode
      * @param  array $headers
      * @return \Illuminate\Http\Response
      */
-    public function toJsonResponse(Exception $exception, $statusCode = null, array $headers = [])
+    public function toJsonResponse(Throwable $exception, $statusCode = null, array $headers = [])
     {
         $replacements = $this->prepareReplacements($exception, $statusCode, $headers);
         $response = $this->getErrorFormat();
@@ -33,6 +33,7 @@ trait FormatsException
 
         $response = $this->removeEmptyReplacements($response);
 
+        /** @var \Symfony\Component\ErrorHandler\Exception\FlattenException $exception */
         return new JsonResponse(
             $response,
             $exception->getStatusCode(),
@@ -44,12 +45,12 @@ trait FormatsException
     /**
      * Prepare the replacements array by gathering the keys and values.
      *
-     * @param  \Exception $exception
+     * @param  \Throwable $exception
      * @param  null|int $statusCode
      * @param  array $headers
      * @return array
      */
-    protected function prepareReplacements(Exception &$exception, $statusCode = null, array $headers = [])
+    protected function prepareReplacements(Throwable &$exception, $statusCode = null, array $headers = [])
     {
         $e = FlattenException::create($exception, $statusCode, $headers);
         $statusCode = $e->getStatusCode();
