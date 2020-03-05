@@ -2,10 +2,11 @@
 
 namespace Jenky\LaravelAPI\Exception;
 
-use Exception;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpFoundation\Response;
+use Jenky\LaravelAPI\Contracts\Http\Validator;
+use Throwable;
 
 trait ExceptionResponse
 {
@@ -20,8 +21,10 @@ trait ExceptionResponse
      */
     protected function unauthenticated($request, AuthenticationException $e)
     {
-        return $request->isApi()
-            ? $this->addCorsHeaders($this->toJsonResponse($e, 401), $request)
+        return $this->isApiRoute($request)
+            ? $this->withCorsHeaders(
+                $this->toJsonResponse($e, 401), $request
+            )
             : parent::unauthenticated($request, $e);
     }
 
@@ -34,8 +37,10 @@ trait ExceptionResponse
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
-        return $request->isApi()
-            ? $this->addCorsHeaders($this->toJsonResponse($e, $e->status), $request)
+        return $this->isApiRoute($request)
+            ? $this->withCorsHeaders(
+                $this->toJsonResponse($e, $e->status), $request
+            )
             : parent::convertValidationExceptionToResponse($e, $request);
     }
 
@@ -43,13 +48,15 @@ trait ExceptionResponse
      * Prepare a response for the given exception.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception $e
+     * @param  \Throwable $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function prepareResponse($request, Exception $e)
+    protected function prepareResponse($request, Throwable $e)
     {
-        return $request->isApi()
-            ? $this->addCorsHeaders($this->toJsonResponse($e), $request)
+        return $this->isApiRoute($request)
+            ? $this->withCorsHeaders(
+                $this->toJsonResponse($e), $request
+            )
             : parent::prepareResponse($request, $e);
     }
 
@@ -57,14 +64,27 @@ trait ExceptionResponse
      * Prepare a JSON response for the given exception.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception $e
+     * @param  \Throwable $e
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function prepareJsonResponse($request, Exception $e)
+    protected function prepareJsonResponse($request, Throwable $e)
     {
-        return $request->isApi()
-            ? $this->addCorsHeaders($this->toJsonResponse($e), $request)
+        return $this->isApiRoute($request)
+            ? $this->withCorsHeaders(
+                $this->toJsonResponse($e), $request
+            )
             : parent::prepareJsonResponse($request, $e);
+    }
+
+    /**
+     * Determine whether current URI is an API route.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return bool
+     */
+    protected function isApiRoute(Request $request)
+    {
+        return $this->container[Validator::class]->matches($request);
     }
 
     /**
@@ -73,11 +93,11 @@ trait ExceptionResponse
      * @param \Symfony\Component\HttpFoundation\Response $response
      * @param \Illuminate\Http\Request $request
      */
-    public function addCorsHeaders($response, $request)
+    public function withCorsHeaders($response, $request)
     {
-        if ($this->container->bound(\Barryvdh\Cors\CorsService::class)) {
-            $response = $this->container[\Barryvdh\Cors\CorsService::class]->addActualRequestHeaders($response, $request);
-        }
+        // if ($this->container->bound(CorsService::class)) {
+        //     $response = $this->container[CorsService::class]->addActualRequestHeaders($response, $request);
+        // }
 
         return $response;
     }

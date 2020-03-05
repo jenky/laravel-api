@@ -1,8 +1,8 @@
 <?php
 
-namespace Jenky\LaravelAPI\Http;
+namespace Jenky\LaravelAPI\Macros;
 
-class ResponseMixins
+class ResponseMacros
 {
     /**
      * Respond with a created response and associate a location and/or content if provided.
@@ -29,20 +29,6 @@ class ResponseMixins
     {
         return function ($content = null, $location = null) {
             return $this->responseWithContentAndLocation(202, $content, $location);
-        };
-    }
-
-    /**
-     * Respond with a no content response.
-     *
-     * @return $this
-     */
-    public function noContent()
-    {
-        return function () {
-            $this->setStatusCode(204);
-
-            return $this;
         };
     }
 

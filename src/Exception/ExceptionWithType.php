@@ -7,7 +7,7 @@ interface ExceptionWithType
     /**
      * Get exception type.
      *
-     * @param  string
+     * @param  string $type
      * @return mixed
      */
     public function setType($type);

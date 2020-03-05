@@ -25,7 +25,7 @@ trait FormatsException
         $replacements = $this->prepareReplacements($exception, $statusCode, $headers);
         $response = $this->getErrorFormat();
 
-        array_walk_recursive($response, function (&$value, $key) use ($exception, $replacements) {
+        array_walk_recursive($response, function (&$value) use ($replacements) {
             if (Str::startsWith($value, ':') && isset($replacements[$value])) {
                 $value = $replacements[$value];
             }
@@ -33,7 +33,12 @@ trait FormatsException
 
         $response = $this->removeEmptyReplacements($response);
 
-        return new JsonResponse($response, $exception->getStatusCode(), $exception->getHeaders(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        return new JsonResponse(
+            $response,
+            $exception->getStatusCode(),
+            $exception->getHeaders(),
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        );
     }
 
     /**
@@ -53,6 +58,7 @@ trait FormatsException
             ':message' => $e->getMessage() ?: Arr::get(Response::$statusTexts, $statusCode),
             ':status_code' => $statusCode,
             ':type' => class_basename($e->getClass()),
+            ':code' => $e->getCode(),
         ];
 
         if ($exception instanceof ValidationException) {
@@ -67,10 +73,6 @@ trait FormatsException
             if (! $exception->getErrors()->isEmpty()) {
                 $replacements[':errors'] = $exception->getErrors();
             }
-        }
-
-        if ($code = $e->getCode()) {
-            $replacements[':code'] = $code;
         }
 
         if ($exception instanceof ExceptionWithType) {
@@ -107,7 +109,7 @@ trait FormatsException
     }
 
     /**
-     * Recursirvely remove any empty replacement values in the response array.
+     * Recursively remove any empty replacement values in the response array.
      *
      * @param array $input
      * @return array
