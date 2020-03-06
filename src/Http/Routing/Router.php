@@ -7,6 +7,7 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RouteRegistrar;
+use Illuminate\Support\Arr;
 use Jenky\LaravelAPI\Contracts\Http\Parser;
 
 class Router
@@ -149,6 +150,6 @@ class Router
     {
         $data = $this->parser->parse($this->request, $this->config->get('api.strict'));
 
-        return array_get($data, 'version');
+        return Arr::get($data, 'version');
     }
 }

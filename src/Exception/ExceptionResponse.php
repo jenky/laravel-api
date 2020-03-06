@@ -21,7 +21,7 @@ trait ExceptionResponse
     protected function unauthenticated($request, AuthenticationException $e)
     {
         return $request->isApi()
-            ? $this->addCorsHeaders($this->toJsonResponse($e, 401), $request)
+            ? $this->toJsonResponse($e, 401)
             : parent::unauthenticated($request, $e);
     }
 
@@ -35,7 +35,7 @@ trait ExceptionResponse
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
         return $request->isApi()
-            ? $this->addCorsHeaders($this->toJsonResponse($e, $e->status), $request)
+            ? $this->toJsonResponse($e, $e->status)
             : parent::convertValidationExceptionToResponse($e, $request);
     }
 
@@ -49,7 +49,7 @@ trait ExceptionResponse
     protected function prepareResponse($request, Exception $e)
     {
         return $request->isApi()
-            ? $this->addCorsHeaders($this->toJsonResponse($e), $request)
+            ? $this->toJsonResponse($e)
             : parent::prepareResponse($request, $e);
     }
 
@@ -63,22 +63,7 @@ trait ExceptionResponse
     protected function prepareJsonResponse($request, Exception $e)
     {
         return $request->isApi()
-            ? $this->addCorsHeaders($this->toJsonResponse($e), $request)
+            ? $this->toJsonResponse($e)
             : parent::prepareJsonResponse($request, $e);
-    }
-
-    /**
-     * Add cors to response headers.
-     *
-     * @param \Symfony\Component\HttpFoundation\Response $response
-     * @param \Illuminate\Http\Request $request
-     */
-    public function addCorsHeaders($response, $request)
-    {
-        if ($this->container->bound(\Barryvdh\Cors\CorsService::class)) {
-            $response = $this->container[\Barryvdh\Cors\CorsService::class]->addActualRequestHeaders($response, $request);
-        }
-
-        return $response;
     }
 }
