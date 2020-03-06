@@ -13,7 +13,7 @@ class ValidatorManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']->get('api.uri_scheme');
+        return $this->config->get('api.uri_scheme');
     }
 
     /**
@@ -24,7 +24,7 @@ class ValidatorManager extends Manager
     protected function createDomainDriver()
     {
         return new DomainValidator(
-            $this->app['config']->get('api.domain')
+            $this->config->get('api.domain')
         );
     }
 
@@ -36,7 +36,7 @@ class ValidatorManager extends Manager
     protected function createPrefixDriver()
     {
         return new PrefixValidator(
-            $this->app['config']->get('api.prefix')
+            $this->config->get('api.prefix')
         );
     }
 }

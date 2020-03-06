@@ -35,6 +35,10 @@ trait ExceptionResponse
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
+        if ($e->response) {
+            return $e->response;
+        }
+
         return $this->expectsJson($request)
             ? $this->toJsonResponse($e, $e->status)
             : parent::convertValidationExceptionToResponse($e, $request);

@@ -13,7 +13,7 @@ class VersionParserManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']->get('api.version_scheme');
+        return $this->config->get('api.version_scheme');
     }
 
     /**
@@ -23,7 +23,7 @@ class VersionParserManager extends Manager
      */
     protected function createHeaderDriver()
     {
-        return new Header($this->app['config']);
+        return new Header($this->config);
     }
 
     /**

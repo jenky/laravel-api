@@ -40,11 +40,11 @@ class ApiServiceProvider extends ServiceProvider
     {
         $this->registerPublishing();
 
-        $this->app[Kernel::class]->prependMiddleware(ApiRequest::class);
+        // $this->app[Kernel::class]->prependMiddleware(ApiRequest::class);
 
         $this->registerRequestMacros();
+
         $this->registerResponseMacros();
-        $this->registerRouterMacros();
     }
 
     /**
@@ -81,15 +81,13 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerRequestValidator()
     {
-        $this->app->singleton('api.validator.manager', function ($app) {
+        $this->app->singleton(ValidatorManager::class, function ($app) {
             return new ValidatorManager($app);
         });
 
         $this->app->singleton(Validator::class, function($app) {
-            return $app->make('api.validator.manager')->driver();
+            return $app->make(ValidatorManager::class)->driver();
         });
-
-        $this->app->alias(Validator::class, 'api.validator');
     }
 
     /**
@@ -100,15 +98,13 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerVersionParser()
     {
-        $this->app->singleton('api.versionParser.manager', function ($app) {
+        $this->app->singleton(VersionParserManager::class, function ($app) {
             return new VersionParserManager($app);
         });
 
         $this->app->singleton(VersionParser::class, function ($app) {
-            return $app->make('api.versionParser.manager')->driver();
+            return $app->make(VersionParserManager::class)->driver();
         });
-
-        $this->app->alias(VersionParser::class, 'api.versionParser');
     }
 
     /**
@@ -129,16 +125,5 @@ class ApiServiceProvider extends ServiceProvider
     protected function registerResponseMacros()
     {
         Response::mixin(new ResponseMacros);
-    }
-
-    /**
-     * Register router and route macros.
-     *
-     * @return void
-     */
-    protected function registerRouterMacros()
-    {
-        $this->app['router']->mixin(new RouterMacros);
-        Route::mixin(new RouteMacros);
     }
 }

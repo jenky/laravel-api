@@ -3,6 +3,7 @@
 namespace Jenky\LaravelAPI\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 
 class ApiRequest
@@ -33,10 +34,23 @@ class ApiRequest
      */
     public function handle($request, Closure $next)
     {
-        if ($this->validator->matches($request) && ! $request->wantsJson()) {
+        if ($this->isApiRequest($request) && ! $request->headers->has('Accept')) {
             $request->headers->set('Accept', 'application/json');
         }
 
+        dd($request->headers, $request->expectsJson());
+
         return $next($request);
+    }
+
+    /**
+     * Determine whether current request is API request.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return bool
+     */
+    protected function isApiRequest(Request $request): bool
+    {
+        return $this->validator->matches($request);
     }
 }
