@@ -2,11 +2,13 @@
 
 namespace Jenky\LaravelAPI;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Contracts\Http\VersionParser;
+use Jenky\LaravelAPI\Http\Middleware\ApiRequest;
 use Jenky\LaravelAPI\Http\Validator\ValidatorManager;
 use Jenky\LaravelAPI\Http\VersionParser\VersionParserManager;
 use Jenky\LaravelAPI\Macros\RequestMacros;
@@ -37,6 +39,9 @@ class ApiServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPublishing();
+
+        $this->app[Kernel::class]->prependMiddleware(ApiRequest::class);
+
         $this->registerRequestMacros();
         $this->registerResponseMacros();
         $this->registerRouterMacros();
@@ -76,9 +81,15 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerRequestValidator()
     {
-        $this->app->singleton(Validator::class, function ($app) {
+        $this->app->singleton('api.validator.manager', function ($app) {
             return new ValidatorManager($app);
         });
+
+        $this->app->singleton(Validator::class, function($app) {
+            return $app->make('api.validator.manager')->driver();
+        });
+
+        $this->app->alias(Validator::class, 'api.validator');
     }
 
     /**
@@ -89,9 +100,15 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerVersionParser()
     {
-        $this->app->singleton(VersionParser::class, function ($app) {
+        $this->app->singleton('api.versionParser.manager', function ($app) {
             return new VersionParserManager($app);
         });
+
+        $this->app->singleton(VersionParser::class, function ($app) {
+            return $app->make('api.versionParser.manager')->driver();
+        });
+
+        $this->app->alias(VersionParser::class, 'api.versionParser');
     }
 
     /**

@@ -21,10 +21,8 @@ trait ExceptionResponse
      */
     protected function unauthenticated($request, AuthenticationException $e)
     {
-        return $this->isApiRoute($request)
-            ? $this->withCorsHeaders(
-                $this->toJsonResponse($e, 401), $request
-            )
+        return $this->expectsJson($request)
+            ? $this->toJsonResponse($e, 401)
             : parent::unauthenticated($request, $e);
     }
 
@@ -37,10 +35,8 @@ trait ExceptionResponse
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
-        return $this->isApiRoute($request)
-            ? $this->withCorsHeaders(
-                $this->toJsonResponse($e, $e->status), $request
-            )
+        return $this->expectsJson($request)
+            ? $this->toJsonResponse($e, $e->status)
             : parent::convertValidationExceptionToResponse($e, $request);
     }
 
@@ -53,10 +49,8 @@ trait ExceptionResponse
      */
     protected function prepareResponse($request, Throwable $e)
     {
-        return $this->isApiRoute($request)
-            ? $this->withCorsHeaders(
-                $this->toJsonResponse($e), $request
-            )
+        return $this->expectsJson($request)
+            ? $this->toJsonResponse($e)
             : parent::prepareResponse($request, $e);
     }
 
@@ -69,10 +63,8 @@ trait ExceptionResponse
      */
     protected function prepareJsonResponse($request, Throwable $e)
     {
-        return $this->isApiRoute($request)
-            ? $this->withCorsHeaders(
-                $this->toJsonResponse($e), $request
-            )
+        return $this->expectsJson($request)
+            ? $this->toJsonResponse($e)
             : parent::prepareJsonResponse($request, $e);
     }
 
@@ -82,23 +74,8 @@ trait ExceptionResponse
      * @param  \Illuminate\Http\Request $request
      * @return bool
      */
-    protected function isApiRoute(Request $request)
+    protected function expectsJson(Request $request)
     {
         return $this->container[Validator::class]->matches($request);
-    }
-
-    /**
-     * Add cors to response headers.
-     *
-     * @param \Symfony\Component\HttpFoundation\Response $response
-     * @param \Illuminate\Http\Request $request
-     */
-    public function withCorsHeaders($response, $request)
-    {
-        // if ($this->container->bound(CorsService::class)) {
-        //     $response = $this->container[CorsService::class]->addActualRequestHeaders($response, $request);
-        // }
-
-        return $response;
     }
 }
