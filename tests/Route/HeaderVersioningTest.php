@@ -20,12 +20,12 @@ class HeaderVersioningTest extends FeatureTestCase
     {
         Route::prefix('api')
             ->group(function () {
-                Route::api('v1')
+                Route::prefix('v1')
                     ->get('/', function () {
                         return $this->getResponseBody('v1');
                     });
 
-                Route::api('v2')
+                Route::prefix('v2')
                     ->get('/', function () {
                         return $this->getResponseBody('v2');
                     });
@@ -41,7 +41,6 @@ class HeaderVersioningTest extends FeatureTestCase
             ->assertJson([
                 'version' => [
                     'set' => $config->get('api.version'),
-                    'route' => $config->get('api.version'),
                 ],
             ]);
     }
@@ -62,7 +61,6 @@ class HeaderVersioningTest extends FeatureTestCase
             ->assertJson([
                 'version' => [
                     'set' => 'v1',
-                    'route' => 'v1',
                 ],
             ]);
     }
@@ -74,7 +72,6 @@ class HeaderVersioningTest extends FeatureTestCase
             ->assertJson([
                 'version' => [
                     'set' => 'v2',
-                    'route' => 'v2',
                 ],
             ]);
     }

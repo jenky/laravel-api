@@ -66,7 +66,6 @@ class FeatureTestCase extends TestCase
         return [
             'version' => [
                 'set' => $version,
-                'route' => request()->route()->version(),
             ],
         ];
     }
