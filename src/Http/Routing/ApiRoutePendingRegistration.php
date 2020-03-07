@@ -54,7 +54,7 @@ class ApiRoutePendingRegistration
      */
     protected function shouldForwardCall(): bool
     {
-        $versionParser = $this->container[VersionParser::class]->driver();
+        $versionParser = $this->container[VersionParser::class];
 
         if ($versionParser instanceof Header) {
             // Only applied if the header versioning is used.

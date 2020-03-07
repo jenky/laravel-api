@@ -43,8 +43,8 @@ class ApiServiceProvider extends ServiceProvider
         // $this->app[Kernel::class]->prependMiddleware(ApiRequest::class);
 
         $this->registerRequestMacros();
-
         $this->registerResponseMacros();
+        $this->registerRouterMacros();
     }
 
     /**
@@ -125,5 +125,17 @@ class ApiServiceProvider extends ServiceProvider
     protected function registerResponseMacros()
     {
         Response::mixin(new ResponseMacros);
+    }
+
+    /**
+     * Register router and route macros.
+     *
+     * @return void
+     */
+    protected function registerRouterMacros()
+    {
+        $this->app['router']->mixin(new RouterMacros);
+
+        Route::mixin(new RouteMacros);
     }
 }

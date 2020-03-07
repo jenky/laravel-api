@@ -7,25 +7,47 @@ use Jenky\LaravelAPI\Test\FeatureTestCase;
 
 class HeaderVersioningTest extends FeatureTestCase
 {
+    /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application   $app
+     *
+     * @return void
+     */
     protected function getEnvironmentSetUp($app)
     {
         parent::getEnvironmentSetUp($app);
 
         $app->get('config')->set('api.version_scheme', 'header');
+    }
+
+    /**
+     * Setup the test environment.
+     *
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
 
         $this->loadRoutes();
     }
 
+    /**
+     * Set up routes
+     *
+     * @return void
+     */
     protected function loadRoutes()
     {
         Route::prefix('api')
             ->group(function () {
-                Route::prefix('v1')
+                Route::api('v1')
                     ->get('/', function () {
                         return $this->getResponseBody('v1');
                     });
 
-                Route::prefix('v2')
+                Route::api('v2')
                     ->get('/', function () {
                         return $this->getResponseBody('v2');
                     });
@@ -45,11 +67,9 @@ class HeaderVersioningTest extends FeatureTestCase
             ]);
     }
 
-    /**
-     * Todo: Fix all below test cases since request headers are dropped.
-     */
     public function test_api_invalid_version_header()
     {
+        // Todo: Fix all below test cases since request headers are dropped.
         $this->getJson('/api', ['Accept' => 'application/x.laravel.v3+json'])
             ->assertNotFound();
     }
@@ -67,6 +87,7 @@ class HeaderVersioningTest extends FeatureTestCase
 
     public function test_api_v2_header()
     {
+        // Todo: Fix all below test cases since request headers are dropped.
         $this->getJson('/api', ['Accept' => 'application/x.laravel.v2+json'])
             ->assertOk()
             ->assertJson([
