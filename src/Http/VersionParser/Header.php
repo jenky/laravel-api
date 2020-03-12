@@ -46,7 +46,7 @@ class Header implements VersionParser
     }
 
     /**
-     * Parse the request an get the API version.
+     * Parse the request and get the API version.
      *
      * @param  \Illuminate\Http\Request $request
      * @return string|null

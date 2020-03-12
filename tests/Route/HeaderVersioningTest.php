@@ -10,8 +10,7 @@ class HeaderVersioningTest extends FeatureTestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application   $app
-     *
+     * @param  \Illuminate\Foundation\Application $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
@@ -34,12 +33,16 @@ class HeaderVersioningTest extends FeatureTestCase
     }
 
     /**
-     * Set up routes
+     * Set up routes.
      *
      * @return void
      */
     protected function loadRoutes()
     {
+        if (! $this->app['request']->expectsJson()) {
+            return;
+        }
+
         Route::prefix('api')
             ->group(function () {
                 Route::api('v1')

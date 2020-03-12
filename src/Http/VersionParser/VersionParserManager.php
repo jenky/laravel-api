@@ -33,6 +33,6 @@ class VersionParserManager extends Manager
      */
     protected function createUriDriver()
     {
-        return new Uri;
+        return new Uri($this->config);
     }
 }

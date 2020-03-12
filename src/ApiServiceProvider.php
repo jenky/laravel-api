@@ -85,7 +85,7 @@ class ApiServiceProvider extends ServiceProvider
             return new ValidatorManager($app);
         });
 
-        $this->app->singleton(Validator::class, function($app) {
+        $this->app->singleton(Validator::class, function ($app) {
             return $app->make(ValidatorManager::class)->driver();
         });
     }

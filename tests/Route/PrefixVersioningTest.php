@@ -10,8 +10,7 @@ class PrefixVersioningTest extends FeatureTestCase
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application   $app
-     *
+     * @param  \Illuminate\Foundation\Application $app
      * @return void
      */
     protected function getEnvironmentSetUp($app)
@@ -34,22 +33,20 @@ class PrefixVersioningTest extends FeatureTestCase
     }
 
     /**
-     * Set up routes
+     * Set up routes.
      *
      * @return void
      */
     protected function loadRoutes()
     {
-        Route::api('v1')
-            ->prefix('api/v1')
+        Route::prefix('api/v1')
             ->group(function () {
                 Route::get('/', function () {
                     return $this->getResponseBody('v1');
                 });
             });
 
-        Route::api('v2')
-            ->prefix('api/v2')
+        Route::prefix('api/v2')
             ->group(function () {
                 Route::get('/', function () {
                     return $this->getResponseBody('v2');
@@ -64,6 +61,7 @@ class PrefixVersioningTest extends FeatureTestCase
             ->assertJson([
                 'version' => [
                     'set' => 'v1',
+                    'request' => 'v1',
                 ],
             ]);
     }
@@ -75,6 +73,7 @@ class PrefixVersioningTest extends FeatureTestCase
             ->assertJson([
                 'version' => [
                     'set' => 'v2',
+                    'request' => 'v2',
                 ],
             ]);
     }
