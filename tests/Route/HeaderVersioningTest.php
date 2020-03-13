@@ -21,28 +21,12 @@ class HeaderVersioningTest extends FeatureTestCase
     }
 
     /**
-     * Setup the test environment.
-     *
-     * @return void
-     */
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->loadRoutes();
-    }
-
-    /**
      * Set up routes.
      *
      * @return void
      */
     protected function loadRoutes()
     {
-        if (! $this->app['request']->expectsJson()) {
-            return;
-        }
-
         Route::prefix('api')
             ->group(function () {
                 Route::api('v1')
@@ -57,8 +41,27 @@ class HeaderVersioningTest extends FeatureTestCase
             });
     }
 
+    /**
+     * Set all headers before load routes.
+     *
+     * @return void
+     */
+    protected function setHeadersAndLoadRoutes(array $headers = [])
+    {
+        // Since createApplication in test case will use default request headers
+        // and routes are loaded into memory so we need to replace all necessary
+        // headers first before register the application routes
+        if (! empty($headers)) {
+            $this->app['request']->headers->add($headers);
+        }
+
+        $this->loadRoutes();
+    }
+
     public function test_api_default_version_header()
     {
+        $this->loadRoutes();
+
         $config = $this->app->get('config');
 
         $this->getJson('/api')
@@ -66,36 +69,43 @@ class HeaderVersioningTest extends FeatureTestCase
             ->assertJson([
                 'version' => [
                     'set' => $config->get('api.version'),
+                    'request' => $config->get('api.version'),
                 ],
             ]);
     }
 
     public function test_api_invalid_version_header()
     {
-        // Todo: Fix all below test cases since request headers are dropped.
+        $this->setHeadersAndLoadRoutes(['Accept' => 'application/x.laravel.v3+json']);
+
         $this->getJson('/api', ['Accept' => 'application/x.laravel.v3+json'])
             ->assertNotFound();
     }
 
     public function test_api_v1_header()
     {
+        $this->setHeadersAndLoadRoutes(['Accept' => 'application/x.laravel.v1+json']);
+
         $this->getJson('/api', ['Accept' => 'application/x.laravel.v1+json'])
             ->assertOk()
             ->assertJson([
                 'version' => [
                     'set' => 'v1',
+                    'request' => 'v1',
                 ],
             ]);
     }
 
     public function test_api_v2_header()
     {
-        // Todo: Fix all below test cases since request headers are dropped.
+        $this->setHeadersAndLoadRoutes(['Accept' => 'application/x.laravel.v2+json']);
+
         $this->getJson('/api', ['Accept' => 'application/x.laravel.v2+json'])
             ->assertOk()
             ->assertJson([
                 'version' => [
                     'set' => 'v2',
+                    'request' => 'v2',
                 ],
             ]);
     }
