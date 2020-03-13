@@ -10,12 +10,12 @@ interface ExceptionWithType
      * @param  string $type
      * @return mixed
      */
-    public function setType($type);
+    public function setType(string $type);
 
     /**
      * Get exception type.
      *
      * @return string
      */
-    public function getType();
+    public function getType(): string;
 }

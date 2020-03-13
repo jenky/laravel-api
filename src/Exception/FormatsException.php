@@ -52,7 +52,7 @@ trait FormatsException
      */
     protected function prepareReplacements(Throwable &$exception, $statusCode = null, array $headers = [])
     {
-        $e = FlattenException::create($exception, $statusCode, $headers);
+        $e = FlattenException::createFromThrowable($exception, $statusCode, $headers);
         $statusCode = $e->getStatusCode();
 
         $replacements = [
