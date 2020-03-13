@@ -6,6 +6,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
+use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 trait ExceptionResponse
@@ -73,12 +74,12 @@ trait ExceptionResponse
     }
 
     /**
-     * Determine whether current URI is an API route.
+     * Determine if the current request expects a JSON response.
      *
      * @param  \Illuminate\Http\Request $request
      * @return bool
      */
-    protected function expectsJson(Request $request)
+    protected function expectsJson(Request $request): bool
     {
         return $this->container[Validator::class]->matches($request);
     }

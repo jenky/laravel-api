@@ -4,6 +4,7 @@ namespace Jenky\LaravelAPI\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 
 class ApiRequest
@@ -34,11 +35,10 @@ class ApiRequest
      */
     public function handle($request, Closure $next)
     {
-        if ($this->isApiRequest($request) && ! $request->headers->has('Accept')) {
+        if ($this->isApiRequest($request) && ! $this->wantsJson($request)) {
+            // Set default Accept header if not available
             $request->headers->set('Accept', 'application/json');
         }
-
-        dd($request->headers, $request->expectsJson());
 
         return $next($request);
     }
@@ -52,5 +52,18 @@ class ApiRequest
     protected function isApiRequest(Request $request): bool
     {
         return $this->validator->matches($request);
+    }
+
+    /**
+     * Determine if the current request is asking for JSON.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return bool
+     */
+    protected function wantsJson(Request $request): bool
+    {
+        // We can't use $request->wantsJson() because it will
+        // cache the Accept header for subsequent check.
+        return Str::contains($request->header('Accept'), ['/json', '+json']);
     }
 }

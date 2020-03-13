@@ -65,7 +65,7 @@ class Header implements VersionParser
      * @param  bool $strict
      * @return array
      */
-    protected function praseHeader(Request $request, $strict = false)
+    protected function praseHeader(Request $request, $strict = false): array
     {
         $standardsTree = $this->config->get('api.standards_tree');
         $subtype = $this->config->get('api.subtype');
