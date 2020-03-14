@@ -45,12 +45,20 @@ class ErrorResponseTest extends FeatureTestCase
 
                     return [];
                 });
+
+                Route::post('post', function () {
+                    abort(403);
+                });
+
+                Route::put('post', function () {
+                    throw new \InvalidArgumentException;
+                });
             });
     }
 
     public function test_authentication()
     {
-        $this->getJson('api/v1/user')
+        $this->get('api/v1/user')
             ->assertUnauthorized()
             ->assertJson([
                 'message' => 'Unauthenticated.',
@@ -61,7 +69,7 @@ class ErrorResponseTest extends FeatureTestCase
 
     public function test_validation()
     {
-        $this->postJson('api/v1/register')
+        $this->post('api/v1/register')
             ->assertStatus(422)
             ->assertJson([
                 'message' => 'The given data was invalid.',
@@ -72,11 +80,33 @@ class ErrorResponseTest extends FeatureTestCase
                 'email', 'name', 'password',
             ]);
 
-        $this->postJson('api/v1/register', [
+        $this->post('api/v1/register', [
             'email' => $this->faker()->email,
             'name' => $this->faker()->name,
             'password' => $password = Str::random(10),
             'password_confirmation' => $password,
         ])->assertOk();
+    }
+
+    public function test_client_error()
+    {
+        $this->post('api/v1/post')
+            ->assertForbidden()
+            ->assertJson([
+                'message' => 'Forbidden',
+                'status_code' => 403,
+                'type' => 'HttpException',
+            ]);
+    }
+
+    public function test_server_error()
+    {
+        $this->put('api/v1/post')
+            ->assertStatus(500)
+            ->assertJson([
+                'message' => 'Internal Server Error',
+                'status_code' => 500,
+                'type' => 'InvalidArgumentException',
+            ]);
     }
 }

@@ -5,7 +5,6 @@ namespace Jenky\LaravelAPI\Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -87,7 +86,6 @@ trait ExceptionResponse
      */
     protected function expectsJson(Request $request, Response $response): bool
     {
-        return $this->container[Validator::class]->matches($request) &&
-            $response instanceof JsonResponse;
+        return $response instanceof JsonResponse;
     }
 }

@@ -28,6 +28,7 @@ class ApiServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/api.php', 'api');
 
         $this->registerRequestValidator();
+
         $this->registerVersionParser();
     }
 
@@ -40,10 +41,12 @@ class ApiServiceProvider extends ServiceProvider
     {
         $this->registerPublishing();
 
-        // $this->app[Kernel::class]->prependMiddleware(ApiRequest::class);
+        $this->app[Kernel::class]->prependMiddleware(ApiRequest::class);
 
         $this->registerRequestMacros();
+
         $this->registerResponseMacros();
+
         $this->registerRouterMacros();
     }
 

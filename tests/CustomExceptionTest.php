@@ -27,17 +27,14 @@ class CustomExceptionTest extends FeatureTestCase
      */
     protected function loadRoutes()
     {
-        Route::prefix('api/exception-type')
+        Route::prefix('api/v1')
             ->group(function () {
-                Route::get('/', function () {
+                Route::get('exception-type', function () {
                     throw (new OauthException(400, 'The grant type is not available for your client!'))
                         ->setType('OauthException');
                 });
-            });
 
-        Route::prefix('api/exception-errors')
-            ->group(function () {
-                Route::get('/', function () {
+                Route::get('exception-errors', function () {
                     throw (new ProcessingException('Unable to process your request.', 1234))
                         ->setErrors([
                             'cache' => 'node is offline',
@@ -49,7 +46,7 @@ class CustomExceptionTest extends FeatureTestCase
 
     public function test_exception_has_type()
     {
-        $this->getJson('api/exception-type')
+        $this->getJson('api/v1/exception-type')
             ->assertStatus(400)
             ->assertJson([
                 'message' => 'The grant type is not available for your client!',
@@ -60,7 +57,7 @@ class CustomExceptionTest extends FeatureTestCase
 
     public function test_exceptions_has_error_bag()
     {
-        $this->getJson('api/exception-errors')
+        $this->getJson('api/v1/exception-errors')
             ->assertStatus(500)
             ->assertJson([
                 'message' => 'Unable to process your request.',
