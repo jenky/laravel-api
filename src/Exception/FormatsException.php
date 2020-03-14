@@ -71,7 +71,7 @@ trait FormatsException
         }
 
         if ($exception instanceof ExceptionWithErrors) {
-            if (! $exception->getErrors()->isEmpty()) {
+            if (! empty($exception->getErrors())) {
                 $replacements[':errors'] = $exception->getErrors();
             }
         }
