@@ -2,11 +2,13 @@
 
 namespace Jenky\LaravelAPI;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Contracts\Http\VersionParser;
+use Jenky\LaravelAPI\Http\Middleware\ApiRequest;
 use Jenky\LaravelAPI\Http\Validator\ValidatorManager;
 use Jenky\LaravelAPI\Http\VersionParser\VersionParserManager;
 use Jenky\LaravelAPI\Macros\RequestMacros;
@@ -26,7 +28,6 @@ class ApiServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/api.php', 'api');
 
         $this->registerRequestValidator();
-
         $this->registerVersionParser();
     }
 
@@ -39,10 +40,10 @@ class ApiServiceProvider extends ServiceProvider
     {
         $this->registerPublishing();
 
+        // $this->app[Kernel::class]->prependMiddleware(ApiRequest::class);
+
         $this->registerRequestMacros();
-
         $this->registerResponseMacros();
-
         $this->registerRouterMacros();
     }
 
