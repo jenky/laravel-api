@@ -43,7 +43,7 @@ class ErrorResponseTest extends FeatureTestCase
                         'password' => 'required|min:8|confirmed',
                     ]);
 
-                    return [];
+                    return response()->noContent();
                 });
 
                 Route::post('post', function () {
@@ -85,7 +85,7 @@ class ErrorResponseTest extends FeatureTestCase
             'name' => $this->faker()->name,
             'password' => $password = Str::random(10),
             'password_confirmation' => $password,
-        ])->assertOk();
+        ])->assertStatus(204);
     }
 
     public function test_client_error()
