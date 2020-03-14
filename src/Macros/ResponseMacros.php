@@ -40,7 +40,7 @@ class ResponseMacros
      * @param  null|string $location
      * @return $this
      */
-    protected function responseWithContentAndLocation()
+    public function responseWithContentAndLocation()
     {
         return function ($status, $content = null, $location = null) {
             $response = response($content, $status);
@@ -50,22 +50,6 @@ class ResponseMacros
             }
 
             return $response;
-        };
-    }
-
-    /**
-     * Return an error.
-     *
-     * @param  int $code
-     * @param  string|null $message
-     * @param  array $headers
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @return void
-     */
-    public function error()
-    {
-        return function ($code = 500, $message = null, array $headers = []) {
-            return abort($code, $message, $headers);
         };
     }
 }
