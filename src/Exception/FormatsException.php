@@ -83,30 +83,41 @@ trait FormatsException
         }
 
         if ($this->runningInDebugMode()) {
-            $trace = config('api.trace.as_string', false)
-                ? explode("\n", $exception->getTraceAsString())
-                : (config('api.trace.include_args', false)
-                    ? $e->getTrace()
-                    : collect($e->getTrace())->map(function ($item) {
-                        return Arr::except($item, ['args']);
-                    })->all()
-                );
-
-            if ($size = config('api.trace.size_limit', 0)) {
-                $trace = array_splice($trace, 0, $size);
-            }
-
-            $replacements[':debug'] = [
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-                'class' => $e->getClass(),
-                'trace' => $trace,
-            ];
+            $replacements[':debug'] = $this->appendDebugInformation($e);
         }
 
         $exception = $e;
 
         return array_merge($replacements, $this->getReplacements());
+    }
+
+    /**
+     * Appends debug information.
+     *
+     * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException $e
+     * @return array
+     */
+    protected function appendDebugInformation(FlattenException $e): array
+    {
+        $trace = config('api.trace.as_string', false)
+            ? explode("\n", $e->getTraceAsString())
+            : (config('api.trace.include_args', false)
+                ? $e->getTrace()
+                : collect($e->getTrace())->map(function ($item) {
+                    return Arr::except($item, ['args']);
+                })->all()
+            );
+
+        if ($size = config('api.trace.size_limit', 0)) {
+            $trace = array_splice($trace, 0, $size);
+        }
+
+        return [
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+            'class' => $e->getClass(),
+            'trace' => $trace,
+        ];
     }
 
     /**
