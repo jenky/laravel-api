@@ -7,7 +7,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
-use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 trait FormatsException
@@ -16,13 +15,16 @@ trait FormatsException
      * Map exception into an JSON response.
      *
      * @param  \Throwable $e
-     * @param  null|int $statusCode
+     * @param  int|null $statusCode
      * @param  array $headers
      * @return \Illuminate\Http\JsonResponse
      */
     public function toJsonResponse(Throwable $exception, ?int $statusCode = null, array $headers = [])
     {
-        $replacements = $this->prepareReplacements($exception, $statusCode, $headers);
+        $replacements = $this->prepareReplacements(
+            $exception, $statusCode, $headers
+        );
+
         $response = $this->getErrorFormat();
 
         array_walk_recursive($response, function (&$value) use ($replacements) {
@@ -31,11 +33,9 @@ trait FormatsException
             }
         });
 
-        $response = $this->removeEmptyReplacements($response);
-
         /** @var \Symfony\Component\ErrorHandler\Exception\FlattenException $exception */
         return new JsonResponse(
-            $response,
+            $this->removeEmptyReplacements($response),
             $exception->getStatusCode(),
             $exception->getHeaders(),
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
@@ -46,18 +46,17 @@ trait FormatsException
      * Prepare the replacements array by gathering the keys and values.
      *
      * @param  \Throwable $exception
-     * @param  null|int $statusCode
+     * @param  int|null $statusCode
      * @param  array $headers
      * @return array
      */
     protected function prepareReplacements(Throwable &$exception, ?int $statusCode = null, array $headers = []): array
     {
         $e = FlattenException::createFromThrowable($exception, $statusCode, $headers);
-        $statusCode = $e->getStatusCode();
 
         $replacements = [
-            ':message' => $e->getMessage() ?: Arr::get(Response::$statusTexts, $statusCode),
-            ':status_code' => $statusCode,
+            ':message' => $e->getMessage() ?: $e->getStatusText(),
+            ':status_code' => $e->getStatusCode(),
             ':type' => class_basename($e->getClass()),
             ':code' => $e->getCode(),
         ];
