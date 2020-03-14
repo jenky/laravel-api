@@ -65,18 +65,6 @@ class ApiServiceProvider extends ServiceProvider
     }
 
     /**
-     * Get API config value.
-     *
-     * @param  string $key
-     * @param  mixed $default
-     * @return mixed
-     */
-    protected function config($key, $default = null)
-    {
-        return $this->app['config']->get('api.'.$key, $default);
-    }
-
-    /**
      * Register the package request validator.
      *
      * @throws \RuntimeException
