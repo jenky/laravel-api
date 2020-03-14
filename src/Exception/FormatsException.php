@@ -18,9 +18,9 @@ trait FormatsException
      * @param  \Throwable $e
      * @param  null|int $statusCode
      * @param  array $headers
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function toJsonResponse(Throwable $exception, $statusCode = null, array $headers = [])
+    public function toJsonResponse(Throwable $exception, ?int $statusCode = null, array $headers = [])
     {
         $replacements = $this->prepareReplacements($exception, $statusCode, $headers);
         $response = $this->getErrorFormat();
@@ -50,7 +50,7 @@ trait FormatsException
      * @param  array $headers
      * @return array
      */
-    protected function prepareReplacements(Throwable &$exception, $statusCode = null, array $headers = [])
+    protected function prepareReplacements(Throwable &$exception, ?int $statusCode = null, array $headers = []): array
     {
         $e = FlattenException::createFromThrowable($exception, $statusCode, $headers);
         $statusCode = $e->getStatusCode();
@@ -112,10 +112,10 @@ trait FormatsException
     /**
      * Recursively remove any empty replacement values in the response array.
      *
-     * @param array $input
+     * @param  array $input
      * @return array
      */
-    protected function removeEmptyReplacements(array $input)
+    protected function removeEmptyReplacements(array $input): array
     {
         foreach ($input as &$value) {
             if (is_array($value)) {
@@ -137,9 +137,9 @@ trait FormatsException
      *
      * @return bool
      */
-    protected function runningInDebugMode()
+    protected function runningInDebugMode(): bool
     {
-        return config('app.debug', false);
+        return (bool) config('app.debug', false);
     }
 
     /**
@@ -147,7 +147,7 @@ trait FormatsException
      *
      * @return array
      */
-    protected function getErrorFormat()
+    protected function getErrorFormat(): array
     {
         return config('api.error_format', [
             'message' => ':message',
@@ -164,7 +164,7 @@ trait FormatsException
      *
      * @return array
      */
-    public function getReplacements()
+    public function getReplacements(): array
     {
         return property_exists($this, 'replacements') ? $this->replacements : [];
     }
