@@ -126,6 +126,21 @@ class ApiServiceProvider extends ServiceProvider
     protected function registerRouterMacros()
     {
         $this->app['router']->mixin(new RouterMacros);
+        /* $this->app['router']->macro(
+            'api', new RouteRegistrarResolver($this->app)
+        );
+
+        $this->app['router']->macro('api', function ($api, array $attributes = [], $routes = null) {
+            $attribute = 'prefix';
+
+            if (count(func_get_args()) > 1) {
+                $attributes[$attribute] = $api;
+
+                return $this->group($attributes, $routes);
+            }
+
+            return $this->__call($attribute, [$api]);
+        }); */
 
         Route::mixin(new RouteMacros);
     }
