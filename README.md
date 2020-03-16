@@ -51,28 +51,7 @@ After publishing Laravel API's assets, its primary configuration file will be lo
 
 ### Register your routes
 
-Route API basically is the same as [Route Groups](https://laravel.com/docs/7.x/routing#route-groups). However it will add all necessary parameters to the route attributes based on the configuration. Because routes are grouped per version you can use the exact same URI to create a different response for the same endpoint.
-
-``` php
-Route::api('v1')
-    ->group(function () {
-        Route::get('/', 'TestController@v1');
-    });
-
-Route::api('v2')
-    ->group(function () {
-        Route::get('/', 'TestController@v2');
-    });
-```
-
-This will generate the following with default configuration:
-
-| Version scheme |   URI   |              Request Header             |                 Action                 |
-|:--------------:|:-------:|:---------------------------------------:|:--------------------------------------:|
-|      `uri`     | /api/v1 |                                         | App\Http\Controllers\TestController@v1 |
-|      `uri`     | /api/v2 |                                         | App\Http\Controllers\TestController@v2 |
-|    `header`    |   /api  | Accept: `application/x.laravel.v1+json` | App\Http\Controllers\TestController@v1 |
-|    `header`    |   /api  | Accept: `application/x.laravel.v2+json` | App\Http\Controllers\TestController@v2 |
+WIP
 
 > For Header versioning, if the request doesn't have the `Accept` header with correct format then default version from config will be used.
 
