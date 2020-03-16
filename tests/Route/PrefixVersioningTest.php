@@ -40,8 +40,6 @@ class PrefixVersioningTest extends FeatureTestCase
     protected function loadRoutes()
     {
         Route::prefix('api/v1')
-        // Route::prefix('api')
-        //     ->api('v1')
             ->group(function () {
                 Route::get('/', function () {
                     return $this->getResponseBody('v1');

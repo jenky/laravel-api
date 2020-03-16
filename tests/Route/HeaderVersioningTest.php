@@ -30,7 +30,7 @@ class HeaderVersioningTest extends FeatureTestCase
         $request = $this->app->make('request');
         $config = $this->app->make('config');
         $version = $version ?: $config->get('api.version');
-// dump($request->version(), $version);
+
         if ($request->version() != $version) {
             return;
         }

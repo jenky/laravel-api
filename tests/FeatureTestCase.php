@@ -53,6 +53,8 @@ class FeatureTestCase extends TestCase
             'database' => ':memory:',
             'prefix' => '',
         ]);
+
+        $config->set('app.debug', true);
     }
 
     /**

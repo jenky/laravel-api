@@ -7,6 +7,19 @@ use Illuminate\Support\Facades\Route;
 
 class ResponseTest extends FeatureTestCase
 {
+    /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application $app
+     * @return void
+     */
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app->get('config')->set('api.trace.as_string', true);
+    }
+
     protected function getJsonStructure()
     {
         $structure = config('api.error_format', []);
@@ -18,12 +31,33 @@ class ResponseTest extends FeatureTestCase
         return $structure;
     }
 
+    public function test_created_response()
+    {
+        Route::get('api/v1/created', function () {
+            return response()->created(null, 'https://google.com');
+        });
+
+        $this->get('api/v1/created')
+            ->assertStatus(201)
+            ->assertHeader('Location', 'https://google.com');
+    }
+
+    public function test_accepted_response()
+    {
+        Route::get('api/v1/accepted', function () {
+            return response()->accepted();
+        });
+
+        $this->get('api/v1/accepted')
+            ->assertStatus(202);
+    }
+
     public function test_not_found_response()
     {
         $structure = $this->getJsonStructure();
         Arr::forget($structure, 'errors');
 
-        $this->getJson('/api/not-found')
+        $this->get('api/v1/not-found')
             ->assertNotFound()
             ->assertJsonStructure(array_keys($structure))
             ->assertJson([
@@ -34,7 +68,7 @@ class ResponseTest extends FeatureTestCase
 
     public function test_validation_errors_response()
     {
-        Route::get('api/errors', function () {
+        Route::get('api/v1/errors', function () {
             request()->validate([
                 'q' => 'required',
             ]);
@@ -42,7 +76,7 @@ class ResponseTest extends FeatureTestCase
             return ['ok' => true];
         });
 
-        $this->getJson('/api/errors')
+        $this->get('api/v1/errors')
             ->assertStatus(422)
             ->assertJsonStructure(array_keys($this->getJsonStructure()))
             ->assertJsonValidationErrors([
@@ -52,14 +86,14 @@ class ResponseTest extends FeatureTestCase
 
     public function test_error_response()
     {
-        Route::get('api/internal-error', function () {
+        Route::get('api/v1/internal-error', function () {
             abort(500);
         });
 
         $structure = $this->getJsonStructure();
         Arr::forget($structure, 'errors');
 
-        $this->getJson('/api/internal-error')
+        $this->get('api/v1/internal-error')
             ->assertStatus(500)
             ->assertJsonStructure(array_keys($structure))
             ->assertJson([
