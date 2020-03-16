@@ -12,6 +12,19 @@ class ErrorResponseTest extends FeatureTestCase
     use WithFaker;
 
     /**
+     * Define environment setup.
+     *
+     * @param  \Illuminate\Foundation\Application $app
+     * @return void
+     */
+    protected function getEnvironmentSetUp($app)
+    {
+        parent::getEnvironmentSetUp($app);
+
+        $app->get('config')->set('api.trace.as_string', true);
+    }
+
+    /**
      * Setup the test environment.
      *
      * @return void

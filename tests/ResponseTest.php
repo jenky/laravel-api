@@ -7,19 +7,6 @@ use Illuminate\Support\Facades\Route;
 
 class ResponseTest extends FeatureTestCase
 {
-    /**
-     * Define environment setup.
-     *
-     * @param  \Illuminate\Foundation\Application $app
-     * @return void
-     */
-    protected function getEnvironmentSetUp($app)
-    {
-        parent::getEnvironmentSetUp($app);
-
-        $app->get('config')->set('api.trace.as_string', true);
-    }
-
     protected function getJsonStructure()
     {
         $structure = config('api.error_format', []);
