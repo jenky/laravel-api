@@ -26,3 +26,4 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Removed
 
 - Remove `error` method from `ResponseMacros`.
+- Remove `api` macro from `Route`.
