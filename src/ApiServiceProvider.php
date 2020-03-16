@@ -3,7 +3,6 @@
 namespace Jenky\LaravelAPI;
 
 use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
@@ -11,10 +10,7 @@ use Jenky\LaravelAPI\Contracts\Http\VersionParser;
 use Jenky\LaravelAPI\Http\Middleware\ApiRequest;
 use Jenky\LaravelAPI\Http\Validator\ValidatorManager;
 use Jenky\LaravelAPI\Http\VersionParser\VersionParserManager;
-use Jenky\LaravelAPI\Macros\RequestMacros;
 use Jenky\LaravelAPI\Macros\ResponseMacros;
-use Jenky\LaravelAPI\Macros\RouteMacros;
-use Jenky\LaravelAPI\Macros\RouterMacros;
 
 class ApiServiceProvider extends ServiceProvider
 {
@@ -46,8 +42,6 @@ class ApiServiceProvider extends ServiceProvider
         $this->registerRequestMacros();
 
         $this->registerResponseMacros();
-
-        $this->registerRouterMacros();
     }
 
     /**
@@ -105,7 +99,17 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerRequestMacros()
     {
-        $this->app['request']->mixin(new RequestMacros);
+        $parser = $this->app->make(VersionParser::class);
+
+        $this->app['request']->macro('version', function () use ($parser) {
+            static $version;
+
+            if (isset($version)) {
+                return $version;
+            }
+
+            return $version = $parser->parse($this);
+        });
     }
 
     /**
@@ -116,32 +120,5 @@ class ApiServiceProvider extends ServiceProvider
     protected function registerResponseMacros()
     {
         Response::mixin(new ResponseMacros);
-    }
-
-    /**
-     * Register router and route macros.
-     *
-     * @return void
-     */
-    protected function registerRouterMacros()
-    {
-        $this->app['router']->mixin(new RouterMacros);
-        /* $this->app['router']->macro(
-            'api', new RouteRegistrarResolver($this->app)
-        );
-
-        $this->app['router']->macro('api', function ($api, array $attributes = [], $routes = null) {
-            $attribute = 'prefix';
-
-            if (count(func_get_args()) > 1) {
-                $attributes[$attribute] = $api;
-
-                return $this->group($attributes, $routes);
-            }
-
-            return $this->__call($attribute, [$api]);
-        }); */
-
-        Route::mixin(new RouteMacros);
     }
 }

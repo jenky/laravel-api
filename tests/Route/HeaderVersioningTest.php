@@ -25,68 +25,67 @@ class HeaderVersioningTest extends FeatureTestCase
      *
      * @return void
      */
-    protected function loadRoutes()
+    protected function loadRoutes($version = null)
     {
-        Route::prefix('api')
-            ->group(function () {
-                Route::api('v1')
-                    ->get('/', function () {
-                        return $this->getResponseBody('v1');
-                    });
+        $request = $this->app->make('request');
+        $config = $this->app->make('config');
+        $version = $version ?: $config->get('api.version');
+// dump($request->version(), $version);
+        if ($request->version() != $version) {
+            return;
+        }
 
-                Route::api('v2')
-                    ->get('/', function () {
-                        return $this->getResponseBody('v2');
-                    });
-            });
+        Route::get('api', function () use ($version) {
+            return $this->getResponseBody($version);
+        });
     }
 
     /**
-     * Set all headers before load routes.
+     * Replace request "Accept" header value.
      *
-     * @return void
+     * @return self
      */
-    protected function setHeadersAndLoadRoutes(array $headers = [])
+    protected function replaceAcceptHeader($value)
     {
         // Since createApplication in test case will use default request headers
-        // and routes are loaded into memory so we need to replace all necessary
-        // headers first before register the application routes
-        if (! empty($headers)) {
-            $this->app['request']->headers->add($headers);
-        }
+        // and routes are loaded into memory so we need to replace "Accept" header
+        // before register the application routes
+        $this->app->make('request')->headers->set('Accept', $value);
 
-        $this->loadRoutes();
+        return $this;
     }
 
     public function test_api_default_version_header()
     {
+        $config = $this->app->make('config');
+
         $this->loadRoutes();
 
-        $config = $this->app->get('config');
-
-        $this->getJson('/api')
+        $this->get('/api')
             ->assertOk()
             ->assertJson([
                 'version' => [
-                    'set' => $config->get('api.version'),
-                    'request' => $config->get('api.version'),
+                    'set' => $version = $config->get('api.version'),
+                    'request' => $version,
                 ],
             ]);
     }
 
     public function test_api_invalid_version_header()
     {
-        $this->setHeadersAndLoadRoutes(['Accept' => 'application/x.laravel.v3+json']);
+        $this->replaceAcceptHeader('application/x.laravel.v3+json')
+            ->loadRoutes();
 
-        $this->getJson('/api', ['Accept' => 'application/x.laravel.v3+json'])
+        $this->get('/api', ['Accept' => 'application/x.laravel.v3+json'])
             ->assertNotFound();
     }
 
     public function test_api_v1_header()
     {
-        $this->setHeadersAndLoadRoutes(['Accept' => 'application/x.laravel.v1+json']);
+        $this->replaceAcceptHeader('application/x.laravel.v1+json')
+            ->loadRoutes('v1');
 
-        $this->getJson('/api', ['Accept' => 'application/x.laravel.v1+json'])
+        $this->get('/api', ['Accept' => 'application/x.laravel.v1+json'])
             ->assertOk()
             ->assertJson([
                 'version' => [
@@ -98,9 +97,10 @@ class HeaderVersioningTest extends FeatureTestCase
 
     public function test_api_v2_header()
     {
-        $this->setHeadersAndLoadRoutes(['Accept' => 'application/x.laravel.v2+json']);
+        $this->replaceAcceptHeader('application/x.laravel.v2+json')
+            ->loadRoutes('v2');
 
-        $this->getJson('/api', ['Accept' => 'application/x.laravel.v2+json'])
+        $this->get('/api', ['Accept' => 'application/x.laravel.v2+json'])
             ->assertOk()
             ->assertJson([
                 'version' => [

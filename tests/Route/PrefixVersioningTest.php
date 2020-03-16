@@ -58,7 +58,7 @@ class PrefixVersioningTest extends FeatureTestCase
 
     public function test_api_v1_prefix()
     {
-        $this->getJson('api/v1')
+        $this->get('api/v1')
             ->assertOk()
             ->assertJson([
                 'version' => [
@@ -70,7 +70,7 @@ class PrefixVersioningTest extends FeatureTestCase
 
     public function test_api_v2_prefix()
     {
-        $this->getJson('api/v2')
+        $this->get('api/v2')
             ->assertOk()
             ->assertJson([
                 'version' => [
