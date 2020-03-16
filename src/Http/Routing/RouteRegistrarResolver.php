@@ -16,39 +16,93 @@ class RouteRegistrarResolver
      */
     protected $app;
 
+    /**
+     * The API request validator instance.
+     *
+     * @var \Jenky\LaravelAPI\Contracts\Http\Validator
+     */
+    protected $validator;
+
+    /**
+     * Create new route registrar resolver instance.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @return void
+     */
     public function __construct(Application $app)
     {
         $this->app = $app;
+        $this->validator = $app->make(Validator::class);
     }
 
-    public function resolveAttribute()
+    /**
+     * Resolve route attribute based on API config.
+     *
+     * @return string|null
+     */
+    public function resolveAttribute(): ?string
     {
-        if ($this->app[Validator::class] instanceof PrefixValidator) {
+        if ($this->validator instanceof PrefixValidator) {
             return 'prefix';
         }
 
-        if ($this->app[Validator::class] instanceof DomainValidator) {
+        if ($this->validator instanceof DomainValidator) {
             return 'domain';
         }
 
         return null;
     }
 
-    public function __invoke()
+    /**
+     * Parse the parameters for route group.
+     *
+     * @param  string $version
+     * @param  array $parameters
+     * @return array
+     */
+    public function parseGroupParameters(string $version, array $parameters): array
     {
-        $self = $this;
+        if (is_callable($parameters[0]) || is_string($parameters[0])) {
+            return [[$this->resolveAttribute() => $version], $parameters[0]];
+        }
 
-        return function ($api, array $attributes = [], $routes = null) use ($self) {
-            $attribute = $self->resolveAttribute();
+        $parameters[0][$this->resolveAttribute()] = $version;
 
-            if (count(func_get_args()) > 1) {
-                $attributes[$attribute] = $api;
+        return $parameters;
+    }
 
-                return $this->group($attributes, $routes);
+    /**
+     * Handle the route api macro.
+     *
+     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @return \Illuminate\Routing\Router|\Illuminate\Routing\RouteRegistrar
+     */
+    public static function macro(Application $app)
+    {
+        $self = new static($app);
+
+        return function ($version, ...$parameters) use ($self) {
+            /** @var \Illuminate\Routing\Router $this */
+            if (! empty($parameters)) {
+                return $this->group(
+                    ...$self->parseGroupParameters($version, $parameters)
+                );
             }
 
-            dd('aaa');
-            return $this->{$attribute}($api);
+            if ($this->container && $this->container->bound(ApiRouteRegistrar::class)) {
+                $registrar = $this->container->make(ApiRouteRegistrar::class);
+            } else {
+                $registrar = new ApiRouteRegistrar($this);
+            }
+
+            if ($attribute = $self->resolveAttribute()) {
+                $registrar->attribute($attribute, $version);
+            }
+
+            return new ApiRoutePendingRegistration(
+                $registrar, $version, $this->container
+            );
+            // return $this->__call($self->resolveAttribute(), [$version]);
         };
     }
 }
