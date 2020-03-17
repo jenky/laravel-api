@@ -35,9 +35,9 @@ class ApiServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->registerPublishing();
-
         $this->app[Kernel::class]->prependMiddleware(ApiRequest::class);
+
+        $this->registerPublishing();
 
         $this->registerRequestMacros();
 
