@@ -72,7 +72,7 @@ class ErrorResponseTest extends FeatureTestCase
     public function test_authentication()
     {
         $this->get('api/v1/user')
-            ->assertUnauthorized()
+            ->assertStatus(401)
             ->assertJson([
                 'message' => 'Unauthenticated.',
                 'status_code' => 401,
