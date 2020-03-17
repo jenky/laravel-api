@@ -67,7 +67,7 @@ class ResponseTest extends FeatureTestCase
             ->assertStatus(422)
             ->assertJsonStructure(array_keys($this->getJsonStructure()))
             ->assertJsonValidationErrors([
-                'q' => 'The q field is required.',
+                'q',
             ]);
     }
 
