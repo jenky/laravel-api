@@ -17,6 +17,8 @@ class HeaderVersioningTest extends FeatureTestCase
     {
         parent::getEnvironmentSetUp($app);
 
+        $app->get('config')->set('api.uri_scheme', 'domain');
+        $app->get('config')->set('api.domain', 'api');
         $app->get('config')->set('api.version_scheme', 'header');
     }
 
@@ -35,8 +37,10 @@ class HeaderVersioningTest extends FeatureTestCase
             return;
         }
 
-        Route::get('api', function () use ($version) {
-            return $this->getResponseBody($version);
+        Route::domain('api.localhost')->group(function () use ($version) {
+            Route::get('/', function () use ($version) {
+                return $this->getResponseBody($version);
+            });
         });
     }
 
@@ -61,7 +65,7 @@ class HeaderVersioningTest extends FeatureTestCase
 
         $this->loadRoutes();
 
-        $this->get('/api')
+        $this->get('http://api.localhost')
             ->assertOk()
             ->assertJson([
                 'version' => [
@@ -76,7 +80,7 @@ class HeaderVersioningTest extends FeatureTestCase
         $this->replaceAcceptHeader('application/x.laravel.v3+json')
             ->loadRoutes();
 
-        $this->get('/api', ['Accept' => 'application/x.laravel.v3+json'])
+        $this->get('http://api.localhost', ['Accept' => 'application/x.laravel.v3+json'])
             ->assertNotFound();
     }
 
@@ -85,7 +89,7 @@ class HeaderVersioningTest extends FeatureTestCase
         $this->replaceAcceptHeader('application/x.laravel.v1+json')
             ->loadRoutes('v1');
 
-        $this->get('/api', ['Accept' => 'application/x.laravel.v1+json'])
+        $this->get('http://api.localhost', ['Accept' => 'application/x.laravel.v1+json'])
             ->assertOk()
             ->assertJson([
                 'version' => [
@@ -100,7 +104,7 @@ class HeaderVersioningTest extends FeatureTestCase
         $this->replaceAcceptHeader('application/x.laravel.v2+json')
             ->loadRoutes('v2');
 
-        $this->get('/api', ['Accept' => 'application/x.laravel.v2+json'])
+        $this->get('http://api.localhost', ['Accept' => 'application/x.laravel.v2+json'])
             ->assertOk()
             ->assertJson([
                 'version' => [
