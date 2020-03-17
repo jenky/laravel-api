@@ -7,7 +7,6 @@ use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Http\Request;
 use Illuminate\Routing\RouteRegistrar;
-use Jenky\LaravelAPI\Contracts\Http\Parser;
 use Jenky\LaravelAPI\Contracts\Http\VersionParser;
 
 class Router
