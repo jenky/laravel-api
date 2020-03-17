@@ -20,14 +20,15 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Added
 
-- Supports Laravel 7 and drops support for Laravel < 7.
+- Laravel 7 support.
 - New middleware to force `Illuminate\Http\Request::expectsJson()` returns `true` if no appropriate header is set.
-- Tests with Github actions.
+- Test with Github actions.
 
 ### Removed
 
 - Remove `error` method from `ResponseMacros`.
 - Remove `api` macro from `Route`.
+- Drop support for Laravel `6.x` and below
 
 ### Fixed
 
