@@ -65,7 +65,7 @@ class DomainValidator implements Validator
      */
     protected function stripPort($domain)
     {
-        if ($domainStripped = preg_replace(self::PATTERN_STRIP_PROTOCOL, null, $domain)) {
+        if ($domainStripped = preg_replace(static::PATTERN_STRIP_PROTOCOL, null, $domain)) {
             return $domainStripped;
         }
 
