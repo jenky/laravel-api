@@ -4,6 +4,7 @@ namespace Jenky\LaravelAPI\Test\Route;
 
 use Illuminate\Support\Facades\Route;
 use Jenky\LaravelAPI\Test\FeatureTestCase;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class HeaderVersioningTest extends FeatureTestCase
 {
@@ -73,6 +74,18 @@ class HeaderVersioningTest extends FeatureTestCase
                     'request' => $version,
                 ],
             ]);
+    }
+
+    public function test_api_strict_default_version_header()
+    {
+        $this->app->make('config')->set('api.strict', true);
+
+        $this->expectException(BadRequestHttpException::class);
+
+        $this->loadRoutes();
+
+        $this->get('http://api.localhost')
+            ->assertStatus(400);
     }
 
     public function test_api_invalid_version_header()
