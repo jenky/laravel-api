@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 
-class Domain implements Validator
+class DomainValidator implements Validator
 {
     /**
      * @var string
@@ -37,7 +37,7 @@ class Domain implements Validator
      * @param  \Illuminate\Http\Request $request
      * @return bool
      */
-    public function validate(Request $request)
+    public function matches(Request $request): bool
     {
         return ! is_null($this->domain) && $request->getHost() === $this->getStrippedDomain();
     }
@@ -65,7 +65,7 @@ class Domain implements Validator
      */
     protected function stripPort($domain)
     {
-        if ($domainStripped = preg_replace(self::PATTERN_STRIP_PROTOCOL, null, $domain)) {
+        if ($domainStripped = preg_replace(static::PATTERN_STRIP_PROTOCOL, null, $domain)) {
             return $domainStripped;
         }
 

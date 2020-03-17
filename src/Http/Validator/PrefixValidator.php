@@ -4,9 +4,12 @@ namespace Jenky\LaravelAPI\Http\Validator;
 
 use Illuminate\Http\Request;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
+use Jenky\LaravelAPI\Http\Concerns\InteractsWithPath;
 
-class Prefix implements Validator
+class PrefixValidator implements Validator
 {
+    use InteractsWithPath;
+
     /**
      * API prefix.
      *
@@ -32,23 +35,12 @@ class Prefix implements Validator
      * @param  \Illuminate\Http\Request $request
      * @return bool
      */
-    public function validate(Request $request)
+    public function matches(Request $request): bool
     {
-        $prefix = $this->filterAndExplode($this->prefix);
+        $prefix = $this->explode($this->prefix);
 
-        $path = $this->filterAndExplode($request->getPathInfo());
+        $paths = $this->explode($request->getPathInfo());
 
-        return ! is_null($this->prefix) && $prefix == array_slice($path, 0, count($prefix));
-    }
-
-    /**
-     * Explode array on slash and remove empty values.
-     *
-     * @param  array $array
-     * @return array
-     */
-    protected function filterAndExplode($array)
-    {
-        return array_filter(explode('/', $array));
+        return ! is_null($this->prefix) && $prefix == array_slice($paths, 0, count($prefix));
     }
 }

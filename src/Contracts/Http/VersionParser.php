@@ -4,13 +4,13 @@ namespace Jenky\LaravelAPI\Contracts\Http;
 
 use Illuminate\Http\Request;
 
-interface Validator
+interface VersionParser
 {
     /**
-     * Validate a request.
+     * Parse the request an get the API version.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return bool
+     * @return string|null
      */
-    public function matches(Request $request): bool;
+    public function parse(Request $request): ?string;
 }

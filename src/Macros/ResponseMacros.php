@@ -1,8 +1,8 @@
 <?php
 
-namespace Jenky\LaravelAPI\Http;
+namespace Jenky\LaravelAPI\Macros;
 
-class ResponseMixins
+class ResponseMacros
 {
     /**
      * Respond with a created response and associate a location and/or content if provided.
@@ -33,20 +33,6 @@ class ResponseMixins
     }
 
     /**
-     * Respond with a no content response.
-     *
-     * @return $this
-     */
-    public function noContent()
-    {
-        return function () {
-            $this->setStatusCode(204);
-
-            return $this;
-        };
-    }
-
-    /**
      * Make a response and associate a location and/or content if provided.
      *
      * @param  int $status
@@ -54,7 +40,7 @@ class ResponseMixins
      * @param  null|string $location
      * @return $this
      */
-    protected function responseWithContentAndLocation()
+    public function responseWithContentAndLocation()
     {
         return function ($status, $content = null, $location = null) {
             $response = response($content, $status);
@@ -64,22 +50,6 @@ class ResponseMixins
             }
 
             return $response;
-        };
-    }
-
-    /**
-     * Return an error.
-     *
-     * @param  int $code
-     * @param  string|null $message
-     * @param  array $headers
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-     * @return void
-     */
-    public function error()
-    {
-        return function ($code = 500, $message = null, array $headers = []) {
-            return abort($code, $message, $headers);
         };
     }
 }

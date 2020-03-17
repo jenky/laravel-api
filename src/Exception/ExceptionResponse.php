@@ -4,7 +4,9 @@ namespace Jenky\LaravelAPI\Exception;
 
 use Exception;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 trait ExceptionResponse
@@ -20,9 +22,11 @@ trait ExceptionResponse
      */
     protected function unauthenticated($request, AuthenticationException $e)
     {
-        return $request->isApi()
+        $response = parent::unauthenticated($request, $e);
+
+        return $this->expectsJson($request, $response)
             ? $this->toJsonResponse($e, 401)
-            : parent::unauthenticated($request, $e);
+            : $response;
     }
 
     /**
@@ -34,9 +38,11 @@ trait ExceptionResponse
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
-        return $request->isApi()
+        $response = parent::convertValidationExceptionToResponse($e, $request);
+
+        return $this->expectsJson($request, $response)
             ? $this->toJsonResponse($e, $e->status)
-            : parent::convertValidationExceptionToResponse($e, $request);
+            : $response;
     }
 
     /**
@@ -48,9 +54,11 @@ trait ExceptionResponse
      */
     protected function prepareResponse($request, Exception $e)
     {
-        return $request->isApi()
+        $response = parent::prepareResponse($request, $e);
+
+        return $this->expectsJson($request, $response)
             ? $this->toJsonResponse($e)
-            : parent::prepareResponse($request, $e);
+            : $response;
     }
 
     /**
@@ -62,8 +70,22 @@ trait ExceptionResponse
      */
     protected function prepareJsonResponse($request, Exception $e)
     {
-        return $request->isApi()
+        $response = parent::prepareJsonResponse($request, $e);
+
+        return $this->expectsJson($request, $response)
             ? $this->toJsonResponse($e)
-            : parent::prepareJsonResponse($request, $e);
+            : $response;
+    }
+
+    /**
+     * Determine if the current request expects a JSON response.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Symfony\Component\HttpFoundation\Response
+     * @return bool
+     */
+    protected function expectsJson(Request $request, Response $response): bool
+    {
+        return $response instanceof JsonResponse;
     }
 }

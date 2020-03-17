@@ -2,57 +2,63 @@
 
 namespace Jenky\LaravelAPI\Exception;
 
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Throwable;
 
 trait FormatsException
 {
     /**
      * Map exception into an JSON response.
      *
-     * @param  \Exception $e
-     * @param  null|int $statusCode
+     * @param  \Throwable $e
+     * @param  int|null $statusCode
      * @param  array $headers
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function toJsonResponse(Exception $exception, $statusCode = null, array $headers = [])
+    public function toJsonResponse(Throwable $exception, ?int $statusCode = null, array $headers = [])
     {
-        $replacements = $this->prepareReplacements($exception, $statusCode, $headers);
+        $replacements = $this->prepareReplacements(
+            $exception, $statusCode, $headers
+        );
+
         $response = $this->getErrorFormat();
 
-        array_walk_recursive($response, function (&$value, $key) use ($exception, $replacements) {
+        array_walk_recursive($response, function (&$value) use ($replacements) {
             if (Str::startsWith($value, ':') && isset($replacements[$value])) {
                 $value = $replacements[$value];
             }
         });
 
-        $response = $this->removeEmptyReplacements($response);
-
-        return new JsonResponse($response, $exception->getStatusCode(), $exception->getHeaders(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        /** @var \Symfony\Component\ErrorHandler\Exception\FlattenException $exception */
+        return new JsonResponse(
+            $this->removeEmptyReplacements($response),
+            $exception->getStatusCode(),
+            $exception->getHeaders(),
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        );
     }
 
     /**
      * Prepare the replacements array by gathering the keys and values.
      *
-     * @param  \Exception $exception
-     * @param  null|int $statusCode
+     * @param  \Throwable $exception
+     * @param  int|null $statusCode
      * @param  array $headers
      * @return array
      */
-    protected function prepareReplacements(Exception &$exception, $statusCode = null, array $headers = [])
+    protected function prepareReplacements(Throwable &$exception, ?int $statusCode = null, array $headers = []): array
     {
-        $e = FlattenException::create($exception, $statusCode, $headers);
-        $statusCode = $e->getStatusCode();
+        $e = FlattenException::createFromThrowable($exception, $statusCode, $headers);
 
         $replacements = [
-            ':message' => $e->getMessage() ?: Arr::get(Response::$statusTexts, $statusCode),
-            ':status_code' => $statusCode,
+            ':message' => $e->getMessage() ?: $e->getStatusText(),
+            ':status_code' => $e->getStatusCode(),
             ':type' => class_basename($e->getClass()),
+            ':code' => $e->getCode(),
         ];
 
         if ($exception instanceof ValidationException) {
@@ -64,13 +70,9 @@ trait FormatsException
         }
 
         if ($exception instanceof ExceptionWithErrors) {
-            if (! $exception->getErrors()->isEmpty()) {
+            if (! empty($exception->getErrors())) {
                 $replacements[':errors'] = $exception->getErrors();
             }
-        }
-
-        if ($code = $e->getCode()) {
-            $replacements[':code'] = $code;
         }
 
         if ($exception instanceof ExceptionWithType) {
@@ -80,25 +82,7 @@ trait FormatsException
         }
 
         if ($this->runningInDebugMode()) {
-            $trace = config('api.trace.as_string', false)
-                ? explode("\n", $exception->getTraceAsString())
-                : (config('api.trace.include_args', false)
-                    ? $e->getTrace()
-                    : collect($e->getTrace())->map(function ($item) {
-                        return Arr::except($item, ['args']);
-                    })->all()
-                );
-
-            if ($size = config('api.trace.size_limit', 0)) {
-                $trace = array_splice($trace, 0, $size);
-            }
-
-            $replacements[':debug'] = [
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
-                'class' => $e->getClass(),
-                'trace' => $trace,
-            ];
+            $replacements[':debug'] = $this->appendDebugInformation($e);
         }
 
         $exception = $e;
@@ -107,12 +91,41 @@ trait FormatsException
     }
 
     /**
-     * Recursirvely remove any empty replacement values in the response array.
+     * Appends debug information.
      *
-     * @param array $input
+     * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException $e
      * @return array
      */
-    protected function removeEmptyReplacements(array $input)
+    protected function appendDebugInformation(FlattenException $e): array
+    {
+        $trace = config('api.trace.as_string', false)
+            ? explode("\n", $e->getTraceAsString())
+            : (config('api.trace.include_args', false)
+                ? $e->getTrace()
+                : collect($e->getTrace())->map(function ($item) {
+                    return Arr::except($item, ['args']);
+                })->all()
+            );
+
+        if ($size = config('api.trace.size_limit', 0)) {
+            $trace = array_splice($trace, 0, $size);
+        }
+
+        return [
+            'line' => $e->getLine(),
+            'file' => $e->getFile(),
+            'class' => $e->getClass(),
+            'trace' => $trace,
+        ];
+    }
+
+    /**
+     * Recursively remove any empty replacement values in the response array.
+     *
+     * @param  array $input
+     * @return array
+     */
+    protected function removeEmptyReplacements(array $input): array
     {
         foreach ($input as &$value) {
             if (is_array($value)) {
@@ -134,9 +147,9 @@ trait FormatsException
      *
      * @return bool
      */
-    protected function runningInDebugMode()
+    protected function runningInDebugMode(): bool
     {
-        return config('app.debug', false);
+        return (bool) config('app.debug', false);
     }
 
     /**
@@ -144,7 +157,7 @@ trait FormatsException
      *
      * @return array
      */
-    protected function getErrorFormat()
+    protected function getErrorFormat(): array
     {
         return config('api.error_format', [
             'message' => ':message',
@@ -161,7 +174,7 @@ trait FormatsException
      *
      * @return array
      */
-    public function getReplacements()
+    public function getReplacements(): array
     {
         return property_exists($this, 'replacements') ? $this->replacements : [];
     }

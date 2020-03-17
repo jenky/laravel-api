@@ -2,19 +2,12 @@
 
 namespace Jenky\LaravelAPI\Exception;
 
-use Illuminate\Support\MessageBag;
-
 trait HasErrorBag
 {
     /**
      * @var array
      */
-    protected $errorBag = [];
-
-    /**
-     * @var \Illuminate\Support\MessageBag
-     */
-    protected $messageBag;
+    protected $errors = [];
 
     /**
      * Set the error messages.
@@ -24,7 +17,7 @@ trait HasErrorBag
      */
     public function setErrors(array $errors)
     {
-        $this->errorBag = $errors;
+        $this->errors = $errors;
 
         return $this;
     }
@@ -32,14 +25,10 @@ trait HasErrorBag
     /**
      * Get the error messages.
      *
-     * @return \Illuminate\Contracts\Support\MessageBag
+     * @return array
      */
     public function getErrors()
     {
-        if (is_null($this->messageBag)) {
-            $this->messageBag = new MessageBag($this->errorBag);
-        }
-
-        return $this->messageBag;
+        return $this->errors;
     }
 }

@@ -2,16 +2,15 @@
 
 namespace Jenky\LaravelAPI;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
-use Jenky\LaravelAPI\Contracts\Http\Parser;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
-use Jenky\LaravelAPI\Http\AcceptParser;
-use Jenky\LaravelAPI\Http\ResponseMixins;
-use Jenky\LaravelAPI\Http\Routing\Router;
-use Jenky\LaravelAPI\Http\Validator\Domain;
-use Jenky\LaravelAPI\Http\Validator\Prefix;
-use RuntimeException;
+use Jenky\LaravelAPI\Contracts\Http\VersionParser;
+use Jenky\LaravelAPI\Http\Middleware\ApiRequest;
+use Jenky\LaravelAPI\Http\Validator\ValidatorManager;
+use Jenky\LaravelAPI\Http\VersionParser\VersionParserManager;
+use Jenky\LaravelAPI\Macros\ResponseMacros;
 
 class ApiServiceProvider extends ServiceProvider
 {
@@ -22,15 +21,11 @@ class ApiServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->setupConfig();
+        $this->mergeConfigFrom(__DIR__.'/../config/api.php', 'api');
 
-        $this->app->singleton(Validator::class, function () {
-            return $this->createRequestValidator();
-        });
+        $this->registerRequestValidator();
 
-        $this->app->singleton(Parser::class, function ($app) {
-            return new AcceptParser($this->config('standards_tree'), $this->config('subtype'), $this->config('version'), 'json');
-        });
+        $this->registerVersionParser();
     }
 
     /**
@@ -40,59 +35,61 @@ class ApiServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->app[Kernel::class]->prependMiddleware(ApiRequest::class);
+
+        $this->registerPublishing();
+
         $this->registerRequestMacros();
+
         $this->registerResponseMacros();
-        $this->registerRouterMacros();
     }
 
     /**
-     * Setup the config.
+     * Register the package's publishable resources.
      *
      * @return void
      */
-    protected function setupConfig()
+    protected function registerPublishing()
     {
-        $configPath = __DIR__.'/../config/api.php';
-        $this->mergeConfigFrom($configPath, 'api');
-
         if ($this->app->runningInConsole()) {
-            $this->publishes([$configPath => config_path('api.php')], 'config');
+            $this->publishes([
+                __DIR__.'/../config/api.php' => config_path('api.php'),
+            ], 'config');
         }
     }
 
     /**
-     * Get API config value.
-     *
-     * @param  string $key
-     * @param  mixed $default
-     * @return mixed
-     */
-    protected function config($key, $default = null)
-    {
-        return $this->app['config']->get('api.'.$key, $default);
-    }
-
-    /**
-     * Create a request validator.
+     * Register the package request validator.
      *
      * @throws \RuntimeException
-     * @return \Jenky\LaravelAPI\Contracts\Http\Validator
+     * @return void
      */
-    protected function createRequestValidator()
+    protected function registerRequestValidator()
     {
-        switch ($this->config('uri_scheme')) {
-            case 'prefix':
-                return new Prefix($this->config('prefix'));
-                break;
+        $this->app->singleton(ValidatorManager::class, function ($app) {
+            return new ValidatorManager($app);
+        });
 
-            case 'domain':
-                return new Domain($this->config('domain'));
-                break;
+        $this->app->singleton(Validator::class, function ($app) {
+            return $app->make(ValidatorManager::class)->driver();
+        });
+    }
 
-            default:
-                throw new RuntimeException('Missing API scheme configuaration.');
-                break;
-        }
+    /**
+     * Register the package version parser.
+     *
+     * @throws \RuntimeException
+     * @return void
+     */
+    protected function registerVersionParser()
+    {
+        $this->app->singleton(VersionParserManager::class, function ($app) {
+            return new VersionParserManager($app);
+        });
+
+        $this->app->singleton(VersionParser::class, function ($app) {
+            return $app->make(VersionParserManager::class)->driver();
+        });
     }
 
     /**
@@ -102,16 +99,16 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerRequestMacros()
     {
-        $validator = $this->app->make(Validator::class);
+        $parser = $this->app->make(VersionParser::class);
 
-        $this->app['request']->macro('isApi', function () use ($validator) {
-            static $isApi;
+        $this->app['request']->macro('version', function () use ($parser) {
+            static $version;
 
-            if (isset($isApi)) {
-                return $isApi;
+            if (isset($version)) {
+                return $version;
             }
 
-            return $isApi = $validator->validate($this);
+            return $version = $parser->parse($this);
         });
     }
 
@@ -122,20 +119,6 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerResponseMacros()
     {
-        Response::mixin(new ResponseMixins);
-    }
-
-    /**
-     * Register router macros.
-     *
-     * @return void
-     */
-    protected function registerRouterMacros()
-    {
-        $router = $this->app->make(Router::class);
-
-        $this->app['router']->macro('api', function ($version, ...$args) use ($router) {
-            return $router->register($version, ...$args);
-        });
+        Response::mixin(new ResponseMacros);
     }
 }

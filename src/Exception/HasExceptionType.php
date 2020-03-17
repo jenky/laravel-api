@@ -13,11 +13,13 @@ trait HasExceptionType
      * Get exception type.
      *
      * @param  string
-     * @return void
+     * @return $this
      */
-    public function setType($type)
+    public function setType(string $type)
     {
         $this->type = $type;
+
+        return $this;
     }
 
     /**
@@ -25,7 +27,7 @@ trait HasExceptionType
      *
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
