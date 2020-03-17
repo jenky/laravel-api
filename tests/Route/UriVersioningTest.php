@@ -77,4 +77,18 @@ class UriVersioningTest extends FeatureTestCase
                 ],
             ]);
     }
+
+    public function test_route_macro()
+    {
+        Route::api('v1', [
+            'prefix' => 'api',
+        ], function () {
+            Route::get('/', function () {
+                return response()->noContent();
+            });
+        });
+
+        $this->get('api/v1')
+            ->assertStatus(204);
+    }
 }

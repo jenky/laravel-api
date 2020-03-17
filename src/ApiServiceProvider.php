@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Jenky\LaravelAPI\Contracts\Http\Validator;
 use Jenky\LaravelAPI\Contracts\Http\VersionParser;
 use Jenky\LaravelAPI\Http\Middleware\ApiRequest;
+use Jenky\LaravelAPI\Http\Routing\Router;
 use Jenky\LaravelAPI\Http\Validator\ValidatorManager;
 use Jenky\LaravelAPI\Http\VersionParser\VersionParserManager;
 use Jenky\LaravelAPI\Macros\ResponseMacros;
@@ -42,6 +43,8 @@ class ApiServiceProvider extends ServiceProvider
         $this->registerRequestMacros();
 
         $this->registerResponseMacros();
+
+        $this->registerRouterMacros();
     }
 
     /**
@@ -120,5 +123,19 @@ class ApiServiceProvider extends ServiceProvider
     protected function registerResponseMacros()
     {
         Response::mixin(new ResponseMacros);
+    }
+
+    /**
+     * Register router macros.
+     *
+     * @return void
+     */
+    protected function registerRouterMacros()
+    {
+        $router = $this->app->make(Router::class);
+
+        $this->app['router']->macro('api', function ($version, ...$args) use ($router) {
+            return $router->register($version, ...$args);
+        });
     }
 }
