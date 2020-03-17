@@ -16,19 +16,28 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Fixed -->
 
-## [6.4.0](https://github.com/jenky/laravel-api/compare/6.3.3...6.4.0) - 2020-03-17
+## [Unreleased]
 
 ### Added
 
 - Laravel 7 support.
+
+### Removed
+
+- Remove `api` macro from `Route`.
+- Drop support for Laravel `6.x` and below.
+
+## [6.4.0](https://github.com/jenky/laravel-api/compare/6.3.3...6.4.0) - 2020-03-17
+
+### Added
+
 - New middleware to force `Illuminate\Http\Request::expectsJson()` returns `true` if no appropriate header is set.
 - Test with Github actions.
 
 ### Removed
 
 - Remove `error` method from `ResponseMacros`.
-- Remove `api` macro from `Route`.
-- Drop support for Laravel `6.x` and below
+- Drop support for Laravel 5.6 and below.
 
 ### Fixed
 
