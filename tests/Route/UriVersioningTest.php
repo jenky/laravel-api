@@ -17,7 +17,7 @@ class UriVersioningTest extends FeatureTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        $app->get('config')->set('api.version_scheme', 'uri');
+        $app->get('config')->set('api.version_scheme', 'prefix');
     }
 
     /**
