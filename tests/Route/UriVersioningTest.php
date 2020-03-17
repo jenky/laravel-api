@@ -5,7 +5,7 @@ namespace Jenky\LaravelAPI\Test\Route;
 use Illuminate\Support\Facades\Route;
 use Jenky\LaravelAPI\Test\FeatureTestCase;
 
-class PrefixVersioningTest extends FeatureTestCase
+class UriVersioningTest extends FeatureTestCase
 {
     /**
      * Define environment setup.
