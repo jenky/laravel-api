@@ -22,6 +22,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 - Laravel 7 support.
 
+### Changed
+
+- Change `version_scheme` config value from `prefix` to `uri`. Using `prefix` is not supported.
+
 ### Removed
 
 - Remove `api` macro from `Route`.
