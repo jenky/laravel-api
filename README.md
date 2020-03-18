@@ -2,6 +2,7 @@
 
 [![Latest Version on Packagist][ico-version]][link-packagist]
 [![Test Status][ico-gh-tests]][link-gh-tests]
+[![Codecov][ico-codecov]][link-codecov]
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Software License][ico-license]](LICENSE.md)
 
@@ -109,6 +110,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/jenky/laravel-api.svg?style=flat
 [ico-downloads]: https://img.shields.io/packagist/dt/jenky/laravel-api.svg?style=flat
 [ico-gh-tests]: https://github.com/jenky/laravel-api/workflows/Tests/badge.svg
+[ico-codecov]: https://codecov.io/gh/jenky/laravel-api/branch/master/graph/badge.svg
 
 [link-packagist]: https://packagist.org/packages/jenky/laravel-api
 [link-travis]: https://travis-ci.com/jenky/laravel-api
@@ -118,3 +120,4 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [link-author]: https://github.com/jenky
 [link-contributors]: ../../contributors
 [link-gh-tests]: https://github.com/jenky/laravel-api/actions
+[link-codecov]: https://codecov.io/gh/jenky/laravel-api
