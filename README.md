@@ -103,12 +103,12 @@ If you discover any security related issues, please email contact@lynh.me instea
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
 
-[ico-version]: https://img.shields.io/packagist/v/jenky/laravel-api.svg?style=flat
-[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat
-[ico-travis]: https://img.shields.io/travis/com/jenky/laravel-api/master.svg?style=flat
-[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/jenky/laravel-api.svg?style=flat
-[ico-code-quality]: https://img.shields.io/scrutinizer/g/jenky/laravel-api.svg?style=flat
-[ico-downloads]: https://img.shields.io/packagist/dt/jenky/laravel-api.svg?style=flat
+[ico-version]: https://img.shields.io/packagist/v/jenky/laravel-api.svg
+[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg
+[ico-travis]: https://img.shields.io/travis/com/jenky/laravel-api/master.svg
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/jenky/laravel-api.svg
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/jenky/laravel-api.svg
+[ico-downloads]: https://img.shields.io/packagist/dt/jenky/laravel-api.svg
 [ico-gh-tests]: https://github.com/jenky/laravel-api/workflows/Tests/badge.svg
 [ico-codecov]: https://codecov.io/gh/jenky/laravel-api/branch/master/graph/badge.svg
 
