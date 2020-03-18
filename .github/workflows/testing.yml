@@ -32,7 +32,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          coverage: none
+          coverage: xdebug
 
       - name: Install dependencies
         run: |
@@ -40,4 +40,7 @@ jobs:
           composer update --prefer-dist --no-interaction --no-suggest
 
       - name: Execute tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
