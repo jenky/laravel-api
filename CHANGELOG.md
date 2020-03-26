@@ -16,18 +16,24 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Fixed -->
 
+## [6.4.1](https://github.com/jenky/laravel-api/compare/6.4.0...6.4.1) - 2020-03-26
+
+### Changed
+- Force return type `array` for `getErrors` method in `ExceptionWithErrors`.
+
+### Removed
+- Remove `setType` method from `ExceptionWithType`.
+- Remove `setErrors` method from `ExceptionWithErrors`.
+
 ## [6.4.0](https://github.com/jenky/laravel-api/compare/6.3.3...6.4.0) - 2020-03-17
 
 ### Added
-
 - New middleware to force `Illuminate\Http\Request::expectsJson()` returns `true` if no appropriate header is set.
 - Test with Github actions.
 
 ### Removed
-
 - Remove `error` method from `ResponseMacros`.
 - Drop support for Laravel `5.6` and below.
 
 ### Fixed
-
 - Various bug fixes.
