@@ -126,4 +126,16 @@ class HeaderVersioningTest extends FeatureTestCase
                 ],
             ]);
     }
+
+    public function test_route_macro()
+    {
+        Route::api('v1', function () {
+            Route::get('/', function () {
+                return response()->noContent();
+            });
+        });
+
+        $this->get('http://api.localhost')
+            ->assertStatus(204);
+    }
 }
