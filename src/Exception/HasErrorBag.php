@@ -27,7 +27,7 @@ trait HasErrorBag
      *
      * @return array
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
