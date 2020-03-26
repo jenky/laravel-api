@@ -28,6 +28,15 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 - Remove `api` macro from `Route`.
 - Drop support for Laravel `6.x` and below.
 
+## [6.4.1](https://github.com/jenky/laravel-api/compare/6.4.0...6.4.1) - 2020-03-26
+
+### Changed
+- Force return type `array` for `getErrors` method in `ExceptionWithErrors`.
+
+### Removed
+- Remove `setType` method from `ExceptionWithType`.
+- Remove `setErrors` method from `ExceptionWithErrors`.
+
 ## [6.4.0](https://github.com/jenky/laravel-api/compare/6.3.3...6.4.0) - 2020-03-17
 
 ### Added
