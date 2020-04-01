@@ -16,6 +16,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Fixed -->
 
+## [6.4.2](https://github.com/jenky/laravel-api/compare/6.4.1...6.4.2) - 2020-04-01
+
+### Changed
+- Both `ExceptionWithErrors` and `ExceptionWithType` now extend `Throwable`.
+
 ## [6.4.1](https://github.com/jenky/laravel-api/compare/6.4.0...6.4.1) - 2020-03-26
 
 ### Changed
