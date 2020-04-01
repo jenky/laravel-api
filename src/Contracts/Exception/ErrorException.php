@@ -1,8 +1,8 @@
 <?php
 
-namespace Jenky\LaravelAPI\Exception;
+namespace Jenky\LaravelAPI\Contracts\Exception;
 
-interface ExceptionWithErrors
+interface ErrorException extends \Throwable
 {
     /**
      * Get the error messages.
