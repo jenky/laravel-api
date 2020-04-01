@@ -23,9 +23,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Changed
 - Change `version_scheme` config value from `prefix` to `uri`. Using `prefix` is not supported.
+- Rename `ExceptionWithErrors` to `ErrorException` and move it to `Contracts\Exception` folder.
 
 ### Removed
 - Remove `api` macro from `Route`.
+- Remove `ExceptionWithType` interface.
 - Drop support for Laravel `6.x` and below.
 
 ## [6.4.1](https://github.com/jenky/laravel-api/compare/6.4.0...6.4.1) - 2020-03-26
