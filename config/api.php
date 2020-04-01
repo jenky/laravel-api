@@ -57,8 +57,8 @@ return [
     | Standards Tree
     |--------------------------------------------------------------------------
     |
-    | Versioning an API with Dingo revolves around content negotiation and
-    | custom MIME types. A custom type will belong to one of three
+    | Versioning an API revolves around content negotiation and custom
+    | MIME types. A custom type will belong to one of three
     | standards trees, the Vendor tree (vnd), the Personal tree
     | (prs), and the Unregistered tree (x).
     |
@@ -90,8 +90,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | This is the default version when strict mode is disabled and your API
-    | is accessed via a web browser. It's also used as the default version
-    | when generating your APIs documentation.
+    | is accessed via a web browser.
     |
     */
 
@@ -104,7 +103,8 @@ return [
     |
     | Enabling strict mode will require clients to send a valid Accept header
     | with every request. This also voids the default API version, meaning
-    | your API will not be browsable via a web browser.
+    | your API will not be browsable via a web browser. This only applies
+    | when version scheme is "header"
     |
     */
 
@@ -116,9 +116,9 @@ return [
     |--------------------------------------------------------------------------
     |
     | When some HTTP exceptions are not caught and dealt with the API will
-    | generate a generic error response in the format provided. Any
-    | keys that aren't replaced with corresponding values will be
-    | removed from the final response.
+    | generate a generic error response in the format provided. Any keys
+    | that aren't replaced with corresponding values will be removed from
+    | the final response.
     |
     */
 
