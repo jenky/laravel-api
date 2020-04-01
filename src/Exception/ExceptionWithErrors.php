@@ -2,7 +2,7 @@
 
 namespace Jenky\LaravelAPI\Exception;
 
-interface ExceptionWithErrors
+interface ExceptionWithErrors extends \Throwable
 {
     /**
      * Get the error messages.
