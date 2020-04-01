@@ -6,6 +6,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Jenky\LaravelAPI\Contracts\Exception\ErrorException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Throwable;
 
@@ -57,7 +58,7 @@ trait FormatsException
         $replacements = [
             ':message' => $e->getMessage() ?: $e->getStatusText(),
             ':status_code' => $e->getStatusCode(),
-            ':type' => class_basename($e->getClass()),
+            ':type' => method_exists($exception, 'getType') ? $exception->getType() : class_basename($e->getClass()),
             ':code' => $e->getCode(),
         ];
 
@@ -69,15 +70,9 @@ trait FormatsException
             }
         }
 
-        if ($exception instanceof ExceptionWithErrors) {
+        if ($exception instanceof ErrorException) {
             if (! empty($exception->getErrors())) {
                 $replacements[':errors'] = $exception->getErrors();
-            }
-        }
-
-        if ($exception instanceof ExceptionWithType) {
-            if ($type = $exception->getType()) {
-                $replacements[':type'] = $type;
             }
         }
 

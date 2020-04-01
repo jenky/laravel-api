@@ -2,10 +2,10 @@
 
 namespace Jenky\LaravelAPI\Test\Fixtures;
 
-use Jenky\LaravelAPI\Exception\ExceptionWithErrors;
+use Jenky\LaravelAPI\Contracts\Exception\ErrorException;
 use Jenky\LaravelAPI\Exception\HasErrorBag;
 
-class ProcessingException extends \Exception implements ExceptionWithErrors
+class ProcessingException extends \Exception implements ErrorException
 {
     use HasErrorBag;
 }
