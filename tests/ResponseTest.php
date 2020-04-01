@@ -1,6 +1,6 @@
 <?php
 
-namespace Jenky\LaravelAPI\Test;
+namespace Jenky\LaravelAPI\Tests;
 
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Request;

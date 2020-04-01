@@ -1,9 +1,9 @@
 <?php
 
-namespace Jenky\LaravelAPI\Test\Route;
+namespace Jenky\LaravelAPI\Tests\Route;
 
 use Illuminate\Support\Facades\Route;
-use Jenky\LaravelAPI\Test\FeatureTestCase;
+use Jenky\LaravelAPI\Tests\FeatureTestCase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class HeaderVersioningTest extends FeatureTestCase

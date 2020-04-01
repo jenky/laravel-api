@@ -1,6 +1,6 @@
 <?php
 
-namespace Jenky\LaravelAPI\Test\Fixtures;
+namespace Jenky\LaravelAPI\Tests\Fixtures;
 
 use Jenky\LaravelAPI\Exception\HasExceptionType;
 use Symfony\Component\HttpKernel\Exception\HttpException;

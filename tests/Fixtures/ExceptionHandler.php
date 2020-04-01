@@ -1,6 +1,6 @@
 <?php
 
-namespace Jenky\LaravelAPI\Test\Fixtures;
+namespace Jenky\LaravelAPI\Tests\Fixtures;
 
 use Jenky\LaravelAPI\Exception\ExceptionResponse;
 use Orchestra\Testbench\Exceptions\Handler;

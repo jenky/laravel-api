@@ -1,10 +1,10 @@
 <?php
 
-namespace Jenky\LaravelAPI\Test;
+namespace Jenky\LaravelAPI\Tests;
 
 use Illuminate\Support\Facades\Route;
-use Jenky\LaravelAPI\Test\Fixtures\OauthException;
-use Jenky\LaravelAPI\Test\Fixtures\ProcessingException;
+use Jenky\LaravelAPI\Tests\Fixtures\OauthException;
+use Jenky\LaravelAPI\Tests\Fixtures\ProcessingException;
 
 class CustomExceptionTest extends FeatureTestCase
 {

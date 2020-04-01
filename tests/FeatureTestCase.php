@@ -1,10 +1,10 @@
 <?php
 
-namespace Jenky\LaravelAPI\Test;
+namespace Jenky\LaravelAPI\Tests;
 
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Jenky\LaravelAPI\ApiServiceProvider;
-use Jenky\LaravelAPI\Test\Fixtures\ExceptionHandler as Handler;
+use Jenky\LaravelAPI\Tests\Fixtures\ExceptionHandler as Handler;
 use Orchestra\Testbench\TestCase;
 
 class FeatureTestCase extends TestCase
