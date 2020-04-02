@@ -18,6 +18,7 @@ class ApiRequest
 
     /**
      * Create a new middleware instance.
+     *
      * @param  \Jenky\LaravelAPI\Contracts\Http\Validator $validator
      * @return void
      */
