@@ -16,6 +16,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Fixed -->
 
+## [7.1.0](https://github.com/jenky/laravel-api/compare/7.0.0...7.1.0) - 2020-09-15
+
+### Added
+- Laravel 8 support.
+
 ## [7.0.0](https://github.com/jenky/laravel-api/compare/6.4.2...7.0.0) - 2020-06-29
 
 ### Added
