@@ -16,6 +16,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ### Fixed -->
 
+## [7.1.1](https://github.com/jenky/laravel-api/compare/7.1.0...7.1.1) - 2020-10-23
+
+### Changed
+- Improve exception handler trait.
+
 ## [7.1.0](https://github.com/jenky/laravel-api/compare/7.0.0...7.1.0) - 2020-09-15
 
 ### Added
