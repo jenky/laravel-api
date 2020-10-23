@@ -46,22 +46,6 @@ trait ExceptionResponse
     }
 
     /**
-     * Prepare a response for the given exception.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Throwable $e
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function prepareResponse($request, Throwable $e)
-    {
-        $response = parent::prepareResponse($request, $e);
-
-        return $this->expectsJson($request, $response)
-            ? $this->toJsonResponse($e)
-            : $response;
-    }
-
-    /**
      * Prepare a JSON response for the given exception.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -70,11 +54,7 @@ trait ExceptionResponse
      */
     protected function prepareJsonResponse($request, Throwable $e)
     {
-        $response = parent::prepareJsonResponse($request, $e);
-
-        return $this->expectsJson($request, $response)
-            ? $this->toJsonResponse($e)
-            : $response;
+        return $this->toJsonResponse($e);
     }
 
     /**

@@ -76,15 +76,26 @@ class Header implements VersionParser
                 throw new BadRequestHttpException(static::$header.' header could not be properly parsed because of a strict matching process.');
             }
 
-            $version = $this->config->get('api.version');
-            $format = $this->config->get('api.format', 'json');
-            $default = sprintf('application/%s.%s.%s+%s', $standardsTree, $subtype, $version, $format);
-
-            preg_match($pattern, $default, $matches);
+            preg_match($pattern, $this->defaultAcceptHeader(), $matches);
         }
 
         return array_combine(
             ['subtype', 'version', 'format'], array_slice($matches, 1)
+        );
+    }
+
+    /**
+     * Get default default Accept header.
+     *
+     * @return string
+     */
+    public function defaultAcceptHeader(): string
+    {
+        return sprintf('application/%s.%s.%s+%s',
+            $this->config->get('api.standards_tree'),
+            $this->config->get('api.subtype'),
+            $this->config->get('api.version'),
+            $this->config->get('api.format', 'json')
         );
     }
 }
