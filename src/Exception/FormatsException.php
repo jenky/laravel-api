@@ -65,7 +65,7 @@ trait FormatsException
         if ($exception instanceof ValidationException) {
             $validator = $exception->validator;
 
-            if (! $validator->errors()->isEmpty()) {
+            if ($validator->errors()->isNotEmpty()) {
                 $replacements[':errors'] = $validator->errors();
             }
         }
@@ -93,16 +93,16 @@ trait FormatsException
      */
     protected function appendDebugInformation(FlattenException $e): array
     {
-        $trace = config('api.trace.as_string', false)
+        $trace = $this->config('api.trace.as_string', false)
             ? explode("\n", $e->getTraceAsString())
-            : (config('api.trace.include_args', false)
+            : ($this->config('api.trace.include_args', false)
                 ? $e->getTrace()
-                : collect($e->getTrace())->map(function ($item) {
+                : array_map(function ($item) {
                     return Arr::except($item, ['args']);
-                })->all()
+                }, $e->getTrace())
             );
 
-        if ($size = config('api.trace.size_limit', 0)) {
+        if ($size = $this->config('api.trace.size_limit', 0)) {
             $trace = array_splice($trace, 0, $size);
         }
 
@@ -138,13 +138,13 @@ trait FormatsException
     }
 
     /**
-     * Determines if we are running in debug mode.
+     * Determines if the application are running in debug mode.
      *
      * @return bool
      */
     protected function runningInDebugMode(): bool
     {
-        return (bool) config('app.debug', false);
+        return (bool) $this->config('app.debug', false);
     }
 
     /**
@@ -154,7 +154,7 @@ trait FormatsException
      */
     protected function getErrorFormat(): array
     {
-        return config('api.error_format', [
+        return $this->config('api.error_format', [
             'message' => ':message',
             'type' => ':type',
             'status_code' => ':status_code',
@@ -162,6 +162,20 @@ trait FormatsException
             'code' => ':code',
             'debug' => ':debug',
         ]);
+    }
+
+    /**
+     * Get the config instance or value.
+     *
+     * @param  string|null  $key
+     * @param  mixed|null  $default
+     * @return mixed
+     */
+    protected function config(?string $key = null, $default = null)
+    {
+        $config = $this->container->make('config');
+
+        return $key ? $config->get($key, $default) : $config;
     }
 
     /**

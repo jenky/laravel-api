@@ -37,7 +37,8 @@ class ApiRequest
     public function handle($request, Closure $next)
     {
         if ($this->isApiRequest($request) && ! $this->wantsJson($request)) {
-            // Set default Accept header if not available
+            // Set default Accept header if not available to force the request
+            // to return JSON response
             $request->headers->set('Accept', 'application/json');
         }
 
