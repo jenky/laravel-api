@@ -17,6 +17,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed -->
 
 
+## [7.1.3](https://github.com/jenky/laravel-api/compare/7.1.2...7.1.3) - 2021-02-17
+
+### Fixed
+- Remove trailing slash in `api.domain` config.
+
 ## [7.1.2](https://github.com/jenky/laravel-api/compare/7.1.1...7.1.2) - 2020-12-11
 
 ### Added
