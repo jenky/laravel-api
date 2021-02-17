@@ -79,6 +79,8 @@ class DomainValidator implements Validator
      */
     protected function getStrippedDomain()
     {
-        return $this->stripPort($this->stripProtocol($this->domain));
+        return rtrim(
+            $this->stripPort($this->stripProtocol($this->domain)), '/'
+        );
     }
 }
