@@ -17,6 +17,11 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Fixed -->
 
 
+## [7.1.4](https://github.com/jenky/laravel-api/compare/7.1.3...7.1.4) - 2021-02-20
+
+### Added
+- Allow to modify a single replacement.
+
 ## [7.1.3](https://github.com/jenky/laravel-api/compare/7.1.2...7.1.3) - 2021-02-17
 
 ### Fixed
