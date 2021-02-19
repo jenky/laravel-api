@@ -200,4 +200,18 @@ trait FormatsException
 
         return $this;
     }
+
+    /**
+     * Replace given key with value.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function replace(string $key, $value)
+    {
+        $this->replacements[Str::start($key, ':')] = $value;
+
+        return $this;
+    }
 }
