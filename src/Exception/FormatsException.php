@@ -94,7 +94,7 @@ trait FormatsException
 
         foreach ($this->exceptionCallbacks as $callback) {
             if (is_a($exception, $this->firstClosureParameterType($callback))) {
-                $callback($exception, $e);
+                $callback($exception, $this);
             }
         }
 

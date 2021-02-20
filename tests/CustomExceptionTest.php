@@ -2,9 +2,12 @@
 
 namespace Jenky\LaravelAPI\Tests;
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Support\Facades\Route;
 use Jenky\LaravelAPI\Tests\Fixtures\OauthException;
 use Jenky\LaravelAPI\Tests\Fixtures\ProcessingException;
+use Throwable;
 
 class CustomExceptionTest extends FeatureTestCase
 {
@@ -41,6 +44,10 @@ class CustomExceptionTest extends FeatureTestCase
                             'queue' => 'under heavy load',
                         ]);
                 });
+
+                Route::get('exception-callback', function () {
+                    throw new AuthenticationException;
+                });
             });
     }
 
@@ -64,6 +71,45 @@ class CustomExceptionTest extends FeatureTestCase
                 'status_code' => 500,
                 'code' => 1234,
                 // 'errors' => [],
+            ]);
+    }
+
+    public function test_exception_callback()
+    {
+        $this->get('api/v1/exception-callback')
+            ->assertStatus(401)
+            ->assertJson([
+                'message' => 'Unauthenticated.',
+                'type' => 'AuthenticationException',
+                'status_code' => 401,
+            ]);
+
+        $this->app->make(ExceptionHandler::class)->catch(AuthenticationException::class, function (Throwable $e, $handler) {
+            $handler->replace('type', 'authentication_error')
+                ->replace('message', 'Authentication failed.');
+        });
+
+        $this->get('api/v1/exception-callback')
+            ->assertStatus(401)
+            ->assertJson([
+                'message' => 'Authentication failed.',
+                'type' => 'authentication_error',
+                'status_code' => 401,
+            ]);
+
+        $this->app->make(ExceptionHandler::class)->catch(function (AuthenticationException $e, $handler) {
+            $handler->setReplacements([
+                ':code' => 1001,
+                ':type' => 'invalid_credentials',
+            ]);
+        });
+
+        $this->get('api/v1/exception-callback')
+            ->assertStatus(401)
+            ->assertJson([
+                'code' => 1001,
+                'type' => 'invalid_credentials',
+                'status_code' => 401,
             ]);
     }
 }
