@@ -2,22 +2,34 @@
 
 namespace Jenky\LaravelAPI\Exception;
 
+use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\ReflectsClosures;
 use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 use Jenky\LaravelAPI\Contracts\Exception\ErrorException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Throwable;
 
 trait FormatsException
 {
+    use ReflectsClosures;
+
+    /**
+     * The registered exception callbacks.
+     *
+     * @var array
+     */
+    protected $exceptionCallbacks = [];
+
     /**
      * Map exception into an JSON response.
      *
-     * @param  \Throwable $e
-     * @param  int|null $statusCode
-     * @param  array $headers
+     * @param  \Throwable  $e
+     * @param  int|null  $statusCode
+     * @param  array  $headers
      * @return \Illuminate\Http\JsonResponse
      */
     public function toJsonResponse(Throwable $exception, ?int $statusCode = null, array $headers = [])
@@ -46,9 +58,9 @@ trait FormatsException
     /**
      * Prepare the replacements array by gathering the keys and values.
      *
-     * @param  \Throwable $exception
-     * @param  int|null $statusCode
-     * @param  array $headers
+     * @param  \Throwable  $exception
+     * @param  int|null  $statusCode
+     * @param  array  $headers
      * @return array
      */
     protected function prepareReplacements(Throwable &$exception, ?int $statusCode = null, array $headers = []): array
@@ -80,6 +92,12 @@ trait FormatsException
             $replacements[':debug'] = $this->appendDebugInformation($e);
         }
 
+        foreach ($this->exceptionCallbacks as $callback) {
+            if (is_a($exception, $this->firstClosureParameterType($callback))) {
+                $callback($exception, $e);
+            }
+        }
+
         $exception = $e;
 
         return array_merge($replacements, $this->getReplacements());
@@ -88,7 +106,7 @@ trait FormatsException
     /**
      * Appends debug information.
      *
-     * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException $e
+     * @param  \Symfony\Component\ErrorHandler\Exception\FlattenException  $e
      * @return array
      */
     protected function appendDebugInformation(FlattenException $e): array
@@ -117,7 +135,7 @@ trait FormatsException
     /**
      * Recursively remove any empty replacement values in the response array.
      *
-     * @param  array $input
+     * @param  array  $input
      * @return array
      */
     protected function removeEmptyReplacements(array $input): array
@@ -191,7 +209,7 @@ trait FormatsException
     /**
      * Set user defined replacements.
      *
-     * @param  array $replacements
+     * @param  array  $replacements
      * @return $this
      */
     public function setReplacements(array $replacements)
@@ -211,6 +229,32 @@ trait FormatsException
     public function replace(string $key, $value)
     {
         $this->replacements[Str::start($key, ':')] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Register callback for given exception.
+     *
+     * @param  \Closure|string  $exception
+     * @param  \Closure|null  $callback
+     * @return $this
+     *
+     * @throws \ReflectionException
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
+     */
+    public function catch($exception, ?Closure $callback = null)
+    {
+        if (is_callable($exception) && is_null($callback)) {
+            $exception = $this->firstClosureParameterType($callback = $exception);
+        }
+
+        if (is_string($exception) && ! $callback) {
+            throw new InvalidArgumentException('Invalid exception mapping.');
+        }
+
+        $this->exceptionCallbacks[$exception] = $callback;
 
         return $this;
     }
