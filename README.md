@@ -13,7 +13,6 @@ The package provides a nice and easy way to define API routes and format JSON er
   - [Installation](#installation)
   - [Configuration](#configuration)
   - [Usage](#usage)
-    - [Register your routes](#register-your-routes)
     - [Error response](#error-response)
   - [Change log](#change-log)
   - [Testing](#testing)
@@ -48,13 +47,9 @@ php artisan vendor:publish --provider="Jenky\LaravelAPI\ApiServiceProvider"
 
 After publishing Laravel API's assets, its primary configuration file will be located at `config/api.php`. This configuration file allows you to configure your api route and error response format and each configuration option includes a description of its purpose, so be sure to thoroughly explore this file.
 
-## Usage
-
-### Register your routes
-
-WIP
-
 > For Header versioning, if the request doesn't have the `Accept` header with correct format then default version from config will be used.
+
+## Usage
 
 ### Error response
 
